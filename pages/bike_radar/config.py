@@ -3,8 +3,8 @@
 APP_NAME = "Bike Radar"
 DEBUG = True
 LOG_LEVEL = "INFO"
-DESCRIPTION = f"""{APP_NAME} is a free and open source app for Nextbike users.
-It secures nearby rides for you, by booking them as soon as they
+DESCRIPTION = f"""{APP_NAME} is a free and open source web app for Nextbike users.
+It secures nearby rides for you by booking them as soon as they
 become available in your selected area."""
 GITHUB_REPO_URL = "https://github.com/mc51/bike-radar"
 MAX_BIKES = 3

@@ -8,6 +8,8 @@ from dash import Dash, html
 from pages.bike_radar.config import DEBUG
 from pages.bike_radar.callbacks import Callbacks
 
+__version__ = "0.0.2"
+
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s %(message).2000s",
     force=True,
