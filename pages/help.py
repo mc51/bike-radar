@@ -1,7 +1,7 @@
 """Help page"""
 import dash
 from dash import html
-from src.config import GITHUB_REPO_URL, APP_NAME
+from pages.src.config import GITHUB_REPO_URL, APP_NAME
 
 
 dash.register_page(__name__, title=f"{APP_NAME} - Help")
