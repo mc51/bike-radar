@@ -3,9 +3,9 @@ import logging
 
 import geopy.distance  # type: ignore
 
-from pages.bike_radar import config
-from pages.bike_radar.api import api
-from pages.bike_radar.bookings import Bookings
+from pages.src import config
+from pages.src.api import api
+from pages.src.bookings import Bookings
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
