@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from pages.bike_radar import config
+from pages.src import config
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)

@@ -2,7 +2,7 @@
 import dash
 from dash import html
 
-from pages.bike_radar.config import DESCRIPTION, GITHUB_REPO_URL, APP_NAME
+from pages.src.config import DESCRIPTION, GITHUB_REPO_URL, APP_NAME
 
 
 dash.register_page(__name__, title=f"{APP_NAME} - About", description=DESCRIPTION)
