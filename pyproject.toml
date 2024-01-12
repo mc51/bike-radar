@@ -1,6 +1,5 @@
 [project]
     name = "bike-radar"
-    dynamic = ["version"]
     description = "Bike Radar is a free and open source web app for Nextbike users. It secures nearby rides for you by booking them as soon as they become available in your selected area."
     readme = "README.md"
     requires-python = ">=3.9"
@@ -23,6 +22,7 @@
         "dash-leaflet==1.0.15",
         "dash==2.14.2",
     ]
+    version = "0.1.0"
 
 [project.urls]
     Documentation = "https://github.com/mc51/bike-radar#readme"
@@ -38,10 +38,7 @@
 
 [tool.rye]
     managed          = true
-    dev-dependencies = []
-
-[tool.hatch.version]
-    path = "app.py"
+    dev-dependencies = ["black==23.12.1", "mypy==1.8.0", "pylint==3.0.3"]
 
 [tool.hatch.metadata]
     allow-direct-references = true

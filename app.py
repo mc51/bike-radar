@@ -5,10 +5,8 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html
 
-from pages.bike_radar.config import DEBUG
+from pages.bike_radar.config import DEBUG, APP_NAME
 from pages.bike_radar.callbacks import Callbacks
-
-__version__ = "0.0.2"
 
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s %(message).2000s",
@@ -41,7 +39,7 @@ app.layout = html.Div(
             horizontal="center",
         ),
         html.Br(),
-        html.H1("Bike Radar"),
+        html.H1(APP_NAME),
         html.Br(),
         dash.page_container,
         html.Br(),
