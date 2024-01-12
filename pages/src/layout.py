@@ -8,8 +8,8 @@ from dash import dcc, html
 from dash_extensions.javascript import assign
 from dash_leaflet import Map, TileLayer
 
-from pages.bike_radar import config
-from pages.bike_radar.locations import locations
+from pages.src import config
+from pages.src.locations import locations
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)

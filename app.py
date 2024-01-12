@@ -5,8 +5,8 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html
 
-from pages.bike_radar.config import DEBUG, APP_NAME
-from pages.bike_radar.callbacks import Callbacks
+from pages.src.config import DEBUG, APP_NAME
+from pages.src.callbacks import Callbacks
 
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s %(message).2000s",

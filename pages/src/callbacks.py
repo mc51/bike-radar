@@ -7,10 +7,10 @@ from dash._callback import NoUpdate
 from dash_leaflet import Map
 from requests import HTTPError
 
-from pages.bike_radar import config
-from pages.bike_radar.api import api
-from pages.bike_radar.locations import locations
-from pages.bike_radar.layout import Layout
+from pages.src import config
+from pages.src.api import api
+from pages.src.locations import locations
+from pages.src.layout import Layout
 
 log = logging.getLogger(__name__)
 
