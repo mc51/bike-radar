@@ -5,7 +5,7 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html
 
-from pages.src.config import DEBUG, APP_NAME
+from pages.src.config import DEBUG, APP_NAME, DESCRIPTION
 from pages.src.callbacks import Callbacks
 
 logging.basicConfig(
@@ -21,7 +21,9 @@ app = Dash(
     __name__,
     use_pages=True,
     suppress_callback_exceptions=True,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    external_stylesheets=[dbc.themes.YETI],
+    meta_tags=[{"name": "description", "content": DESCRIPTION}],
+    serve_locally=DEBUG,  # In production use CDN to serve dash js and css
 )
 server = app.server
 app.layout = html.Div(
@@ -44,7 +46,8 @@ app.layout = html.Div(
         dash.page_container,
         html.Br(),
     ],
-    style={"height": "700px", "width": "900px", "margin": "auto"},
+    className="mycontent",
+    style={"margin": "auto"},
 )
 
 Callbacks().register_callbacks()

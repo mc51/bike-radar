@@ -7,7 +7,6 @@ tmp/
 *secret*
 *.json
 config.json
-assets/
 *.csv
 *.txt
 !requirements*.txt
