@@ -47,7 +47,7 @@ app.layout = html.Div(
         html.Br(),
     ],
     className="mycontent",
-    style={"margin": "auto"},
+    style={"height": "100%", "margin": "auto"},
 )
 
 Callbacks().register_callbacks()

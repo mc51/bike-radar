@@ -75,10 +75,7 @@ class Layout:
                         html.Br(),
                     ],
                 ),
-                html.Div(
-                    id="map_div",
-                    style={"height": "inherit", "width": "inherit,"},
-                ),
+                html.Div(id="map_div"),
                 dcc.Store(id="store_radar", storage_type="memory"),
                 dcc.Interval(
                     id="interval",
@@ -87,7 +84,6 @@ class Layout:
                     disabled=True,
                 ),
             ],
-            style={"height": "700px", "width": "900px"},
         )
 
     def create_city_select_layout(self) -> dbc.Form:
@@ -262,7 +258,7 @@ class Layout:
             ]
             + self.create_bike_markers(city_id),
             eventHandlers=self.MAP_CLICK_HANDLER,
-            style={"height": "80%", "width": "100%"},
+            style={"height": "500px"},
             center=[lat, lon],
             zoom=zoom,
             id="map",
