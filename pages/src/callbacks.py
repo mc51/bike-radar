@@ -290,8 +290,10 @@ class Callbacks:
             radar_status (dict): status data
 
         Returns:
-            tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]: status, booking status 2,
-                disable interval
+            tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]:
+            radar status,
+            booking status 2,
+            disable interval
         """
         log.info("Interval triggered %s", n_intervals)
         log.debug("Radar status: %s", radar_status)

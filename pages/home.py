@@ -11,7 +11,7 @@ dash.register_page(
 
 layout = html.Div(
     [
-        html.H5("""Book your nearby ride the moment it appears!"""),
+        html.H5("""Book your nearby Nextbike ride the moment it appears!"""),
         html.Br(),
         Layout().create_page_layout(),
     ]

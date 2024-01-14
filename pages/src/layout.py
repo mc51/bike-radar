@@ -80,7 +80,6 @@ class Layout:
                 dcc.Interval(
                     id="interval",
                     interval=self.REFRESH_INTERVAL,
-                    n_intervals=0,
                     disabled=True,
                 ),
             ],
@@ -129,29 +128,44 @@ class Layout:
         form = dbc.Form(
             id="login_form",
             children=[
-                html.H5("Login to Nextbike Account"),
+                dbc.Label("Login to Nextbike Account", width="auto"),
                 html.Br(),
                 dbc.Row(
                     [
-                        dbc.Label("Phone", width="auto"),
                         dbc.Col(
                             dbc.Input(
                                 type="string",
                                 id="phone",
-                                placeholder="Enter phone number",
+                                placeholder="Phone no.",
                             ),
-                        ),
-                        dbc.Label("PIN", width="auto"),
-                        dbc.Col(
-                            dbc.Input(
-                                type="password", id="pin", placeholder="Enter PIN"
-                            ),
-                        ),
-                        dbc.Col(
-                            dbc.Button("Login", id="login_button", color="primary"),
-                            width="auto",
+                            width=6,
                         ),
                     ],
+                    justify="start",
+                    align="center",
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            dbc.Input(
+                                type="password",
+                                id="pin",
+                                placeholder="PIN",
+                            ),
+                            width=6,
+                        ),
+                    ],
+                    justify="start",
+                    align="center",
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            dbc.Button("Login", id="login_button", color="primary"),
+                            width=2,
+                        ),
+                    ],
+                    justify="start",
                 ),
             ],
         )
