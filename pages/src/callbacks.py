@@ -321,7 +321,7 @@ class Callbacks:
         ts_now = int(datetime.now(tz=timezone.utc).timestamp())
         if store_data.get("auto_booking_ts"):
             booking_start = store_data["auto_booking_ts"]
-            if ts_now - booking_start > int(config.MAX_BOOKING_DURATION_MIN / 60):
+            if ts_now - booking_start > int(config.MAX_BOOKING_DURATION_MIN * 60):
                 log.warning("Reached max auto booking duration. Stopping.")
                 store_data["auto_booking_ts"] = None
                 return (
