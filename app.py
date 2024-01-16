@@ -16,11 +16,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger(__name__)
-
-# make sure we don't show or save any credentials
+# hide any sensitive information even on debug level
 for h in logging.root.handlers:
     h.setFormatter(RedactingFormatter(h.formatter))
-
 log.setLevel(logging.DEBUG)
 
 app = Dash(

@@ -15,11 +15,14 @@ log.setLevel(config.LOG_LEVEL)
 MAX_BIKES = config.MAX_BIKES
 
 
-class Locations:
+class Locations:  # pylint: disable=too-many-instance-attributes
     """Locations class."""
 
-    def __init__(self, login_key: str | None = None):
-        log.debug("locations")
+    def __init__(self, store_data: dict | None = None):
+        log.debug("Locations")
+
+        self.store_data = store_data
+        login_key = store_data["login_key"] if store_data else None
         self.api = Api(login_key)
         self.db_con = sqlite3.connect(config.DB_NAME)
 
@@ -209,7 +212,7 @@ class Locations:
             dict | None: booking status
         """
         log.info("Booking bike %s.", place_id)
-        current_booking = Bookings(self.api)
+        current_booking = Bookings(self.api, self.store_data)
         if current_booking.is_active:
             log.info("There already is an active booking. Canceling it first.")
             if not self.cancel_booking(booking_id=current_booking.id):
@@ -231,9 +234,9 @@ class Locations:
             bike (dict): bike
 
         Returns:
-            bool: bike
+            bool: is booked
         """
-        booking = Bookings(self.api)
+        booking = Bookings(self.api, self.store_data)
         if booking.distance and bike["distance"] >= booking.distance:
             log.info(
                 "Bike distance %s not closer than current booking %s.",
@@ -255,23 +258,21 @@ class Locations:
             log.warning("Bike can only be rented but not booked.")
         return False
 
-    def start_booking_process(self, radar_status: dict) -> Bookings:
-        """Start booking process.
-
-        Args:
-            radar (dict): radar status
+    def start_booking_process(self) -> Bookings:
+        """Start booking process. Use store data to recreate client state.
 
         Returns:
             BikeBooking: bike booking
         """
         log.info("Starting booking process.")
-        self.api = Api(radar_status["login_key"])
+
+        assert self.store_data, "No store data."
 
         near_bikes = self.get_near_bikes(
-            radius=radar_status["radius"],
-            lat=radar_status["lat"],
-            lon=radar_status["lon"],
-            city_id=radar_status["city_id"],
+            radius=self.store_data["radius"],
+            lat=self.store_data["lat"],
+            lon=self.store_data["lon"],
+            city_id=self.store_data["city_id"],
         )
         if not near_bikes:
             log.info("No near bikes found.")

@@ -4,7 +4,7 @@ import re
 
 
 class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods
-    """Redact loginkey from logs."""
+    """Redact sensitive strings from logs."""
 
     def __init__(self, orig_formatter):  # pylint: disable=super-init-not-called
         self.orig_formatter = orig_formatter
@@ -17,7 +17,7 @@ class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods
             record (_type_): record
 
         Returns:
-            str: redacted record
+            str: redacted message
         """
         msg: str = self.orig_formatter.format(record)
         msg = msg.replace("'", '"')

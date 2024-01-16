@@ -77,7 +77,7 @@ class Layout:
                     ],
                 ),
                 html.Div(id="map_div"),
-                dcc.Store(id="store_radar", storage_type="memory"),
+                dcc.Store(id="store", storage_type="memory"),
                 dcc.Interval(
                     id="interval",
                     interval=self.REFRESH_INTERVAL,

@@ -31,13 +31,12 @@ class Callbacks:
         log.debug("callbacks")
         self.app = get_app()
         self.api = Api()
-        self.locations = Locations()
 
     def register_callbacks(self) -> None:
         """Register callbacks."""
 
         self.app.callback(
-            Output("store_radar", "data", allow_duplicate=True),
+            Output("store", "data", allow_duplicate=True),
             Output("login_feedback", "children"),
             Output("login_feedback", "color"),
             Output("login_feedback", "is_open"),
@@ -50,7 +49,7 @@ class Callbacks:
         )(self.cb_check_login)
 
         self.app.callback(
-            Output("store_radar", "data", allow_duplicate=True),
+            Output("store", "data", allow_duplicate=True),
             Output("map_div", "children"),
             Output("city_select_div", "hidden"),
             Output("login_div", "hidden", allow_duplicate=True),
@@ -60,33 +59,33 @@ class Callbacks:
         )(self.cb_select_city)
 
         self.app.callback(
-            Output("store_radar", "data", allow_duplicate=True),
+            Output("store", "data", allow_duplicate=True),
             Output("radar_circle", "radius"),
             Input("radar_slider", "value"),
-            State("store_radar", "data"),
+            State("store", "data"),
             prevent_initial_call=True,
         )(self.cb_set_radar_radius)
 
         self.app.callback(
-            Output("store_radar", "data", allow_duplicate=True),
+            Output("store", "data", allow_duplicate=True),
             Output("radar_circle", "center"),
             Input("map", "coords"),
-            State("store_radar", "data"),
+            State("store", "data"),
             prevent_initial_call=True,
         )(self.cb_set_radar_position)
 
         self.app.callback(
-            Output("store_radar", "data", allow_duplicate=True),
+            Output("store", "data", allow_duplicate=True),
             Output("booking_status_2", "children", allow_duplicate=True),
             Output("interval", "disabled", allow_duplicate=True),
             Input("interval", "n_intervals"),
-            State("store_radar", "data"),
+            State("store", "data"),
             prevent_initial_call=True,
         )(self.cb_interval_triggered)
 
         self.app.callback(
             output=[
-                Output("store_radar", "data", allow_duplicate=True),
+                Output("store", "data", allow_duplicate=True),
                 Output("booking_status_1", "children", allow_duplicate=True),
                 Output("booking_status_2", "children", allow_duplicate=True),
                 Output("booking_button", "children"),
@@ -96,7 +95,7 @@ class Callbacks:
             ],
             inputs=[
                 Input("booking_button", "n_clicks"),
-                State("store_radar", "data"),
+                State("store", "data"),
             ],
             prevent_initial_call=True,
         )(self.toggle_auto_booking)
@@ -108,19 +107,23 @@ class Callbacks:
             city (str): city name
 
         Returns:
-            tuple[dict, Map, bool, bool]: store_radar data, map div children, city_select_div hidden,
-            login_div hidden
+            tuple[dict, Map, bool, bool]:
+                store data,
+                map div children,
+                city_select_div hidden,
+                login_div hidden
         """
-        selected_city = self.locations.get_city_from_name(city)
-        radar_status = {
+        locations = Locations()
+        selected_city = locations.get_city_from_name(city)
+        store_data = {
             "lat": selected_city["lat"],
             "lon": selected_city["lng"],
             "zoom": selected_city["zoom"],
             "city_id": selected_city["uid"],
             "radius": self.DEFAULT_RADAR_RADIUS,
         }
-        log.info("Selected: %s", radar_status)
-        return radar_status, Layout().create_map_layout(**radar_status), True, False
+        log.info("Selected: %s", store_data)
+        return store_data, Layout().create_map_layout(**store_data), True, False
 
     def cb_check_login(
         self, _, phone: str, pin: int
@@ -134,7 +137,7 @@ class Callbacks:
 
         Returns:
             tuple[Patch | NoUpdate, str, str,  bool, bool, bool]:
-                store_radar data,
+                store data,
                 alert text, alert color, alert is_open,
                 radar div hidden, login div hidden
         """
@@ -158,10 +161,10 @@ class Callbacks:
                 True,
                 False,
             )
-        store_radar = Patch()
-        store_radar["login_key"] = login_key  # update single value
+        store_data = Patch()
+        store_data["login_key"] = login_key  # update single value
         return (
-            store_radar,
+            store_data,
             "Login successful.",
             "success",
             True,
@@ -169,7 +172,7 @@ class Callbacks:
             True,
         )
 
-    def cb_set_radar_radius(self, value: int, status: dict) -> tuple[dict, int]:
+    def cb_set_radar_radius(self, value: int, store_data: dict) -> tuple[dict, int]:
         """Change radar radius according to slider settings.
 
         Args:
@@ -179,31 +182,31 @@ class Callbacks:
             tuple[dict, dict]: status, radius
         """
         log.debug("Radar radius from slider %s", value)
-        if not status:
-            log.warning("no radar_status")
-            status = {
+        if not store_data:
+            log.warning("no store_data")
+            store_data = {
                 "booked": False,
             }
-        status["radius"] = value
-        log.debug("Setting radius. Status %s", status)
-        return status, status["radius"]
+        store_data["radius"] = value
+        log.debug("Setting radius. Status %s", store_data)
+        return store_data, store_data["radius"]
 
     def cb_set_radar_position(
-        self, coords: list, radar_status: dict
+        self, coords: list, store_data: dict
     ) -> tuple[dict | NoUpdate, list | NoUpdate]:
         """Set radar position and save coordinates from click on map.
 
         Args:
             coords (list): click coordinates
-            radar_status (dict): radar_status
+            store_data (dict): store data
 
         Returns:
-            tuple[dict | NoUpdate, list | NoUpdate]: radar_status, center coordinates
+            tuple[dict | NoUpdate, list | NoUpdate]: store data, center coordinates
         """
         log.debug(coords)
-        if not radar_status:
-            log.warning("no radar_status")
-            radar_status = {
+        if not store_data:
+            log.warning("no store_data")
+            store_data = {
                 "radius": self.DEFAULT_RADAR_RADIUS,
                 "booked": False,
             }
@@ -213,14 +216,14 @@ class Callbacks:
             log.info("No coord set yet.")
             return no_update, no_update
 
-        radar_status["lat"] = round(coords[0], 5)
-        radar_status["lon"] = round(coords[1], 5)
-        radar_status["center"] = [radar_status["lat"], radar_status["lon"]]
-        log.debug("Setting position. Status %s", radar_status)
-        return radar_status, radar_status["center"]
+        store_data["lat"] = round(coords[0], 5)
+        store_data["lon"] = round(coords[1], 5)
+        store_data["center"] = [store_data["lat"], store_data["lon"]]
+        log.debug("Setting position. Status %s", store_data)
+        return store_data, store_data["center"]
 
     def toggle_auto_booking(
-        self, n_clicks: int, status: dict
+        self, n_clicks: int, store_data: dict
     ) -> tuple[
         dict | NoUpdate,
         dbc.Alert,
@@ -234,7 +237,7 @@ class Callbacks:
 
         Args:
             n_clicks (int): interval number
-            status (dict): status data
+            store_data (dict): store data
 
         Returns:
             tuple[dict | NoUpdate,
@@ -242,15 +245,15 @@ class Callbacks:
                 str | NoUpdate, str | NoUpdate,
                 dict | NoUpdate,
                 bool | NoUpdate]:
-            status,
+            store data,
             booking status 1 children, booking status 2 children,
             booking button children, color,
             booking_spinner style, disable interval
         """
         log.info("Enable auto booking button triggered %s", n_clicks)
-        log.debug(status)
-        if not status or not status.get("lat"):
-            log.info("Not set radar_status yet")
+        log.debug(store_data)
+        if not store_data or not store_data.get("lat"):
+            log.info("Not set store_data yet")
             return (
                 no_update,
                 dbc.Alert(
@@ -264,11 +267,11 @@ class Callbacks:
                 no_update,
                 no_update,
             )
-        if status.get("enabled"):
+        if store_data.get("enabled"):
             # is enabled, so toggle off
-            status["enabled"] = False
+            store_data["enabled"] = False
             return (
-                status,
+                store_data,
                 dbc.Alert(
                     "Auto booking disabled",
                     color="success",
@@ -281,9 +284,9 @@ class Callbacks:
                 True,
             )
         # is disabled, so toggle on
-        status["enabled"] = True
+        store_data["enabled"] = True
         return (
-            status,
+            store_data,
             dbc.Alert(
                 "Auto booking enabled",
                 color="success",
@@ -297,30 +300,29 @@ class Callbacks:
         )
 
     def cb_interval_triggered(
-        self, n_intervals: int, radar_status: dict
+        self, n_intervals: int, store_data: dict
     ) -> tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]:
         """Interval triggered.
 
         Args:
             n_intervals (int): interval number
-            radar_status (dict): status data
+            store_data (dict): store_data
 
         Returns:
             tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]:
-            radar status,
+            store_data,
             booking status 2,
             disable interval
         """
         log.info("Interval triggered %s", n_intervals)
-        log.debug("Radar status: %s", radar_status)
-
+        log.debug("store_data: %s", store_data)
+        locations = Locations(store_data)
         try:
-            booking = self.locations.start_booking_process(radar_status)
+            booking = locations.start_booking_process()
         except HTTPError as e:
             log.exception(e)
             return no_update, f"Error booking bike: {e}", no_update
-
         if booking:
-            radar_status["booked"] = booking.is_active
-            return radar_status, booking.to_status(), no_update
+            store_data["booked"] = booking.is_active
+            return store_data, booking.to_status(), no_update
         return no_update, no_update, no_update
