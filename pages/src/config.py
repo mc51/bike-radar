@@ -1,8 +1,12 @@
 """Configuration"""
+
 # General
-APP_NAME = "Bike Radar"
 DEBUG = True
-LOG_LEVEL = "INFO"
+APP_NAME = "Bike Radar"
+LOG_LEVEL = "DEBUG"
+DB_NAME = "bikeradar.db"
+DB_TABLE = "bikes"
+CLAIM = "Book your nearby Nextbike ride the moment it appears!"
 DESCRIPTION = f"""{APP_NAME} is a free and open source web app for Nextbike users.
 It secures nearby rides for you by booking them as soon as they
 become available in your selected area."""
@@ -14,12 +18,13 @@ MIN_RADAR_RADIUS = 100
 MAX_RADAR_RADIUS = 1000
 DEFAULT_RADAR_RADIUS = 800
 RADAR_RADIUS_STEP = 250
-REFRESH_INTERVAL = 1000 * 30  # in ms
+FRONTEND_REFRESH_INTERVAL = 1000 * 30  # in ms
 STATUS_MSG_DURATION = 1000 * 4  # in ms
 
 # API
 API_KEY = "rXXqTgQZUPZ89lzB"
 API_TIMEOUT = 20
+API_REFRESH_INTERVAL = 10
 BASE_URL = "https://api.nextbike.net/api/v1.1/"
 LOGIN_URL = BASE_URL + "login.json"
 BOOKING_URL = BASE_URL + "booking.json"

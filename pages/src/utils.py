@@ -1,17 +1,17 @@
 """Utilities"""
 from logging import Formatter
+import re
 
 
 class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods
     """Redact loginkey from logs."""
 
-    def __init__(self, orig_formatter, patterns, *args, **kwargs):
+    def __init__(self, orig_formatter):  # pylint: disable=super-init-not-called
         self.orig_formatter = orig_formatter
-        self._patterns = patterns
-        super().__init__(*args, **kwargs)
+        self.patterns = ["mobile", "loginkey", "login_key", "pin"]
 
     def format(self, record) -> str:
-        """Format record.
+        """Format record by replacing all values of keys corresponding to pattern.
 
         Args:
             record (_type_): record
@@ -20,10 +20,14 @@ class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods
             str: redacted record
         """
         msg: str = self.orig_formatter.format(record)
-        for p in self._patterns:
-            pos = msg.find(p)
-            if pos > 0:
-                msg = msg[:pos] + " loginkey **** " + msg[pos + 30 :]
+        msg = msg.replace("'", '"')
+
+        for pattern in self.patterns:
+            p = rf'"{pattern}":\s*"([^"]+)"'
+            match = re.search(p, msg)
+            if match:
+                secret = match.group(1)
+                msg = msg.replace(str(secret), "***redacted***")
         return msg
 
     def __getattr__(self, attr):

@@ -23,11 +23,10 @@ class Api:
     BOOKING_INFO_URL = config.BOOKING_INFO_URL
     CANCEL_BOOKING_URL = config.CANCEL_BOOKING_URL
 
-    def __init__(self):
+    def __init__(self, login_key: str | None = None):
         self.mobile = None
         self.pin = None
-        self.login_key = None
-        self.domain = None
+        self.login_key = login_key
 
     def send_api_request(
         self, url: str, params: dict | None = None, post: bool = False
@@ -67,14 +66,14 @@ class Api:
         json_response = response.json()
         return json_response
 
-    def authenticate(self, phone: str, pin: int) -> bool:
+    def authenticate(self, phone: str, pin: int) -> str | None:
         """Authenticate to api and save loginkey.
         Args:
             phone (str): phone number
             pin (int): pin
 
         Returns:
-            bool: login success
+            str | None: login key
         """
         log.info("Authenticating to API and getting login key")
         payload = {
@@ -85,11 +84,10 @@ class Api:
         response = self.send_api_request(self.LOGIN_URL, payload, post=True)
         if response.get("error"):
             log.error("ERROR: Authentication failed %s", response["error"])
-            return False
+            return None
         log.info("OK: Authentication successful")
         self.login_key = response["user"]["loginkey"]
-        self.domain = response["user"]["domain"]
-        return True
+        return self.login_key
 
     def request_locations(self, city_id: int | None = None) -> dict[str, list]:
         """Request location data.
@@ -174,6 +172,3 @@ class Api:
         }
         response = self.send_api_request(self.BOOKINGS_URL, params)
         return response
-
-
-api = Api()

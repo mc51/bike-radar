@@ -2,17 +2,18 @@
 import logging
 
 import dash_bootstrap_components as dbc
-from dash import Input, Output, State, get_app, no_update
+from dash import Input, Output, Patch, State, get_app, no_update
 from dash._callback import NoUpdate
 from dash_leaflet import Map
 from requests import HTTPError
 
 from pages.src import config
-from pages.src.api import api
-from pages.src.locations import locations
+from pages.src.api import Api
 from pages.src.layout import Layout
+from pages.src.locations import Locations
 
 log = logging.getLogger(__name__)
+log.setLevel(config.LOG_LEVEL)
 
 
 class Callbacks:
@@ -23,18 +24,20 @@ class Callbacks:
     MAX_RADAR_RADIUS = config.MAX_RADAR_RADIUS
     DEFAULT_RADAR_RADIUS = config.DEFAULT_RADAR_RADIUS
     RADAR_RADIUS_STEP = config.RADAR_RADIUS_STEP
-    REFRESH_INTERVAL = config.REFRESH_INTERVAL
+    REFRESH_INTERVAL = config.FRONTEND_REFRESH_INTERVAL
     STATUS_MSG_DURATION = config.STATUS_MSG_DURATION
 
     def __init__(self):
+        log.debug("callbacks")
         self.app = get_app()
-        self.api = api
-        self.locations = locations
+        self.api = Api()
+        self.locations = Locations()
 
     def register_callbacks(self) -> None:
         """Register callbacks."""
 
         self.app.callback(
+            Output("store_radar", "data", allow_duplicate=True),
             Output("login_feedback", "children"),
             Output("login_feedback", "color"),
             Output("login_feedback", "is_open"),
@@ -121,37 +124,50 @@ class Callbacks:
 
     def cb_check_login(
         self, _, phone: str, pin: int
-    ) -> tuple[str, str, bool, bool, bool]:
+    ) -> tuple[Patch | NoUpdate, str, str, bool, bool, bool]:
         """Check login credentials. Display radar controls after successful
-        login.
+        login and save loginkey to store data.
 
         Args:
             phone (str): phone number
             pin (int): pin
 
         Returns:
-            tuple[str, str,  bool, bool, bool]: alert text, alert color, alert is_open,
+            tuple[Patch | NoUpdate, str, str,  bool, bool, bool]:
+                store_radar data,
+                alert text, alert color, alert is_open,
                 radar div hidden, login div hidden
         """
         log.info("Checking login credentials.")
         if not phone or not pin:
             return (
+                no_update,
                 "Please enter your Nextbike phone and PIN.",
                 "danger",
                 True,
                 True,
                 False,
             )
-        auth = self.api.authenticate(phone, pin)
-        if not auth:
+        login_key = self.api.authenticate(phone, pin)
+        if not login_key:
             return (
+                no_update,
                 "Login failed. Please check credentials and retry.",
                 "danger",
                 True,
                 True,
                 False,
             )
-        return "Login successful.", "success", True, False, True
+        store_radar = Patch()
+        store_radar["login_key"] = login_key  # update single value
+        return (
+            store_radar,
+            "Login successful.",
+            "success",
+            True,
+            False,
+            True,
+        )
 
     def cb_set_radar_radius(self, value: int, status: dict) -> tuple[dict, int]:
         """Change radar radius according to slider settings.

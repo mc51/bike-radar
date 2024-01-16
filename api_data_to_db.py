@@ -57,7 +57,7 @@ def create_db_table(con: sqlite3.Connection):
     try:
         with con:
             con.execute(
-                """CREATE TABLE IF NOT EXISTS bikes
+                f"""CREATE TABLE IF NOT EXISTS {config.DB_TABLE}
                         (
                             data TEXT,
                             created_at TEXT
@@ -65,9 +65,9 @@ def create_db_table(con: sqlite3.Connection):
                         """
             )
     except sqlite3.Error:
-        log.exception("DB Error creating table.")
-    else:
-        log.info("DB created")
+        log.exception("ERROR: creating db table.")
+        raise
+    log.info("OK: created db table.")
 
 
 def write_data_to_db(con: sqlite3.Connection, json_data: dict):
@@ -81,14 +81,15 @@ def write_data_to_db(con: sqlite3.Connection, json_data: dict):
     data = json.dumps(json_data)
     try:
         with con:
+            con.execute(f"DELETE FROM {config.DB_TABLE}")
             con.execute(
-                "INSERT INTO bikes(data, created_at) VALUES(?, ?)",
+                f"INSERT INTO {config.DB_TABLE} (data, created_at) VALUES(?, ?)",
                 (data, now),
             )
     except sqlite3.Error:
-        log.exception("DB Error writing data.")
+        log.exception("ERROR: writing data to db table.")
     else:
-        log.info("DB updated")
+        log.info("OK: updated table data.")
 
 
 def update_loop(con: sqlite3.Connection):
@@ -101,15 +102,15 @@ def update_loop(con: sqlite3.Connection):
     while True:
         data = get_all_data()
         write_data_to_db(con, data)
-        time.sleep(config.REFRESH_INTERVAL)
+        time.sleep(config.API_REFRESH_INTERVAL)
 
 
 def main():
     """Main"""
-    log.info("Start get_data.py")
+    log.info("Starting to get data from API and save to db.")
     create_db_table(CONNECTION)
     update_loop(CONNECTION)
-    log.info("End get_data.py")
+    log.info("Finishing getting data.")
 
 
 if __name__ == "__main__":

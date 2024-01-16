@@ -7,14 +7,20 @@ from dash import Dash, html
 
 from pages.src.config import DEBUG, APP_NAME, DESCRIPTION
 from pages.src.callbacks import Callbacks
+from pages.src.utils import RedactingFormatter
 
 logging.basicConfig(
-    format="%(asctime)s %(name)s %(levelname)s %(message).2000s",
+    format="%(asctime)s %(name)s %(levelname)s %(message).400s",
     force=True,
     level=logging.ERROR,
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger(__name__)
+
+# make sure we don't show or save any credentials
+for h in logging.root.handlers:
+    h.setFormatter(RedactingFormatter(h.formatter))
+
 log.setLevel(logging.DEBUG)
 
 app = Dash(

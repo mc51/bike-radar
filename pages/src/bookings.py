@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import geopy.distance  # type: ignore
 
 from pages.src import config
-from pages.src.api import api
+from pages.src.api import Api
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -28,17 +28,20 @@ class Bookings:  # pylint: disable=too-many-instance-attributes
     distance: int | None = None
     booked: bool = False
 
-    def __init__(self, radar_status: dict | None = None):
-        """bike booking
-
-        Args:
-            radar_status (dict | None, optional): Radar status. Defaults to None.
+    def __init__(self, api: Api | None = None):
         """
-        self.api = api
+        Args:
+            api (Api | None, optional): Api. Defaults to None.
+        """
+        self.api = Api()
+        if api:
+            self.api = api
+
         self.current_booking = self.get_last_booking()
         if self.current_booking:
             for key, value in self.current_booking.items():
                 setattr(self, key, value)
+
         if radar_status and self.is_active:
             log.info("Getting distance for current booking.")
             self.distance = self.get_distance_from_coords(
