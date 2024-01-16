@@ -9,7 +9,7 @@ from dash_extensions.javascript import assign
 from dash_leaflet import Map, TileLayer
 
 from pages.src import config
-from pages.src.locations import locations
+from pages.src.locations import Locations
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -23,7 +23,7 @@ class Layout:
     MAX_RADAR_RADIUS = config.MAX_RADAR_RADIUS
     DEFAULT_RADAR_RADIUS = config.DEFAULT_RADAR_RADIUS
     RADAR_RADIUS_STEP = config.RADAR_RADIUS_STEP
-    REFRESH_INTERVAL = config.REFRESH_INTERVAL
+    REFRESH_INTERVAL = config.FRONTEND_REFRESH_INTERVAL
     STATUS_MSG_DURATION = config.STATUS_MSG_DURATION
 
     MAP_CLICK_HANDLER = {
@@ -35,7 +35,8 @@ class Layout:
     }
 
     def __init__(self):
-        self.locations = locations
+        log.debug("layout")
+        self.locations = Locations()
 
     def create_page_layout(self) -> html.Div:
         """Create page layout.
@@ -75,19 +76,14 @@ class Layout:
                         html.Br(),
                     ],
                 ),
-                html.Div(
-                    id="map_div",
-                    style={"height": "inherit", "width": "inherit,"},
-                ),
-                dcc.Store(id="store_radar", storage_type="memory"),
+                html.Div(id="map_div"),
+                dcc.Store(id="store", storage_type="memory"),
                 dcc.Interval(
                     id="interval",
                     interval=self.REFRESH_INTERVAL,
-                    n_intervals=0,
                     disabled=True,
                 ),
             ],
-            style={"height": "700px", "width": "900px"},
         )
 
     def create_city_select_layout(self) -> dbc.Form:
@@ -133,29 +129,44 @@ class Layout:
         form = dbc.Form(
             id="login_form",
             children=[
-                html.H5("Login to Nextbike Account"),
+                dbc.Label("Login to Nextbike Account", width="auto"),
                 html.Br(),
                 dbc.Row(
                     [
-                        dbc.Label("Phone", width="auto"),
                         dbc.Col(
                             dbc.Input(
                                 type="string",
                                 id="phone",
-                                placeholder="Enter phone number",
+                                placeholder="Phone no.",
                             ),
-                        ),
-                        dbc.Label("PIN", width="auto"),
-                        dbc.Col(
-                            dbc.Input(
-                                type="password", id="pin", placeholder="Enter PIN"
-                            ),
-                        ),
-                        dbc.Col(
-                            dbc.Button("Login", id="login_button", color="primary"),
-                            width="auto",
+                            width=6,
                         ),
                     ],
+                    justify="start",
+                    align="center",
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            dbc.Input(
+                                type="password",
+                                id="pin",
+                                placeholder="PIN",
+                            ),
+                            width=6,
+                        ),
+                    ],
+                    justify="start",
+                    align="center",
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            dbc.Button("Login", id="login_button", color="primary"),
+                            width=2,
+                        ),
+                    ],
+                    justify="start",
                 ),
             ],
         )
@@ -217,9 +228,8 @@ class Layout:
         Returns:
             list: markers
         """
-        self.locations.update_locations(city_id)
         markers = []
-        for bike in locations.bikes:
+        for bike in self.locations.bikes:
             markers.append(
                 dash_leaflet.CircleMarker(
                     center=[bike["lat"], bike["lng"]],
@@ -262,7 +272,7 @@ class Layout:
             ]
             + self.create_bike_markers(city_id),
             eventHandlers=self.MAP_CLICK_HANDLER,
-            style={"height": "80%", "width": "100%"},
+            style={"height": "500px"},
             center=[lat, lon],
             zoom=zoom,
             id="map",

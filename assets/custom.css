@@ -1,0 +1,20 @@
+/*###Desktops, big landscape tablets and laptops(Large, Extra large)####*/
+@media screen and (min-width: 1024px) {
+    .mycontent {
+        width: 45%;
+    }
+}
+
+/*###Tablet(medium)###*/
+@media screen and (min-width : 768px) and (max-width : 1023px) {
+    .mycontent {
+        width: 60%;
+    }
+}
+
+/*### Smartphones (portrait and landscape)(small)### */
+@media screen and (min-width : 0px) and (max-width : 767px) {
+    .mycontent {
+        width: 90%;
+    }
+}

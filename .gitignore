@@ -7,12 +7,12 @@ tmp/
 *secret*
 *.json
 config.json
-assets/
 *.csv
 *.txt
 !requirements*.txt
 cache/
 tmp*
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

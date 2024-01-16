@@ -1,10 +1,12 @@
 """Locations stuff"""
+import json
 import logging
+import sqlite3
 
 import geopy.distance  # type: ignore
 
 from pages.src import config
-from pages.src.api import api
+from pages.src.api import Api
 from pages.src.bookings import Bookings
 
 log = logging.getLogger(__name__)
@@ -13,39 +15,60 @@ log.setLevel(config.LOG_LEVEL)
 MAX_BIKES = config.MAX_BIKES
 
 
-class Locations:
+class Locations:  # pylint: disable=too-many-instance-attributes
     """Locations class."""
 
-    def __init__(self):
-        self.api = api
-        self.locations = self.get_locations()
-        self.countries = self.locations["countries"]
-        self.cities = self.locations["cities"]
-        self.places = self.locations["places"]
-        self.cities_with_bikes = self.filter_for_cities_with_bikes(self.cities)
-        self.bikes = self.filter_places_for_bikes(self.places)
+    def __init__(self, store_data: dict | None = None):
+        log.debug("Locations")
 
-    def get_locations(self, city_id: int | None = None) -> dict[str, list]:
-        """Get all locations data. Includes countries, cities and places.
+        self.store_data = store_data
+        login_key = store_data["login_key"] if store_data else None
+        self.api = Api(login_key)
+        self.db_con = sqlite3.connect(config.DB_NAME)
 
-        Args:
-            city (str | None, optional): filter for city. Defaults to None.
+        self.locations: dict[str, list]
+        self.countries: list
+        self.cities: list
+        self.places: list
+        self.cities_with_bikes: list
+        self.bikes: list
+
+        self.update_locations()
+
+    def get_all_locations(self) -> dict[str, list]:
+        """Get all locations data.
 
         Returns:
             dict[str, list]: locations
         """
         log.info("Getting all locations data.")
-        map_data = self.api.request_locations(city_id)
-        return map_data
+        con = self.db_con
+        try:
+            with con:
+                results = con.execute(f"select data from {config.DB_TABLE}")
+                data = results.fetchone()
+        except sqlite3.Error:
+            log.exception("ERROR: reading data from db.")
+            raise
+        log.info("OK: read data from db.")
+        return json.loads(data[0])
 
-    def update_locations(self, city_id: int | None = None):
-        """Update all locations data. Includes countries, cities and places.
+    def get_bikes_in_city(self, city_id: int) -> list:
+        """Get bikes in city.
 
         Args:
-            city (str | None, optional): filter for city. Defaults to None.
+            city_id (int): city id
+
+        Returns:
+            list: places
         """
+        log.info("Getting bikes in city: %s.", city_id)
+        return [bike for bike in self.bikes if bike["city_id"] == city_id]
+
+    def update_locations(self):
+        """Update all locations data."""
         log.info("Updating all locations data.")
-        self.locations = self.get_locations(city_id)
+        self.locations = self.get_all_locations()
         self.countries = self.locations["countries"]
         self.cities = self.locations["cities"]
         self.places = self.locations["places"]
@@ -137,9 +160,9 @@ class Locations:
             radius,
             city_id,
         )
-        self.update_locations(city_id)
+        bikes = self.get_bikes_in_city(city_id)
         near_bikes = []
-        for bike in self.bikes:
+        for bike in bikes:
             if bike["bikes_available_to_rent"] > 0:
                 distance = geopy.distance.distance(
                     (bike["lat"], bike["lng"]), (lat, lon)
@@ -189,7 +212,7 @@ class Locations:
             dict | None: booking status
         """
         log.info("Booking bike %s.", place_id)
-        current_booking = Bookings()
+        current_booking = Bookings(self.api, self.store_data)
         if current_booking.is_active:
             log.info("There already is an active booking. Canceling it first.")
             if not self.cancel_booking(booking_id=current_booking.id):
@@ -204,17 +227,16 @@ class Locations:
         log.warning("Booking could not be finished.")
         return None
 
-    def should_be_booked(self, radar: dict, bike: dict) -> bool:
+    def should_be_booked(self, bike: dict) -> bool:
         """Determine if bike should be booked.
 
         Args:
-            radar (dict): radar status
             bike (dict): bike
 
         Returns:
-            bool: bike
+            bool: is booked
         """
-        booking = Bookings(radar_status=radar)
+        booking = Bookings(self.api, self.store_data)
         if booking.distance and bike["distance"] >= booking.distance:
             log.info(
                 "Bike distance %s not closer than current booking %s.",
@@ -236,21 +258,21 @@ class Locations:
             log.warning("Bike can only be rented but not booked.")
         return False
 
-    def start_booking_process(self, radar_status: dict) -> Bookings:
-        """Start booking process.
-
-        Args:
-            radar (dict): radar status
+    def start_booking_process(self) -> Bookings:
+        """Start booking process. Use store data to recreate client state.
 
         Returns:
             BikeBooking: bike booking
         """
         log.info("Starting booking process.")
+
+        assert self.store_data, "No store data."
+
         near_bikes = self.get_near_bikes(
-            radius=radar_status["radius"],
-            lat=radar_status["lat"],
-            lon=radar_status["lon"],
-            city_id=radar_status["city_id"],
+            radius=self.store_data["radius"],
+            lat=self.store_data["lat"],
+            lon=self.store_data["lon"],
+            city_id=self.store_data["city_id"],
         )
         if not near_bikes:
             log.info("No near bikes found.")
@@ -258,13 +280,10 @@ class Locations:
             log.info("Found near bikes.")
 
         for bike in near_bikes:
-            if self.should_be_booked(radar_status, bike):
+            if self.should_be_booked(bike):
                 self.book_bike(bike["uid"])
                 break
             log.info("Bike should not be booked.")
         else:
             log.info("No (new) bikes booked.")
-        return Bookings(radar_status=radar_status)
-
-
-locations = Locations()
+        return Bookings(self.api)
