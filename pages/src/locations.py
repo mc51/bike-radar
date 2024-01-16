@@ -286,4 +286,4 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             log.info("Bike should not be booked.")
         else:
             log.info("No (new) bikes booked.")
-        return Bookings(self.api)
+        return Bookings(self.api, self.store_data)
