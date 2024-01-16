@@ -1,7 +1,7 @@
 """Configuration"""
 
 # General
-DEBUG = True
+DEBUG = False
 APP_NAME = "Bike Radar"
 LOG_LEVEL = "DEBUG"
 DB_NAME = "bikeradar.db"
@@ -20,7 +20,7 @@ DEFAULT_RADAR_RADIUS = 800
 RADAR_RADIUS_STEP = 250
 FRONTEND_REFRESH_INTERVAL = 1000 * 30  # in ms
 STATUS_MSG_DURATION = 1000 * 4  # in ms
-MAX_BOOKING_DURATION = 60 * 15  # in s
+MAX_BOOKING_DURATION_MIN = 15  # in min
 
 # API
 API_KEY = "rXXqTgQZUPZ89lzB"

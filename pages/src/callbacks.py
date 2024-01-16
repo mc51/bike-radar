@@ -1,5 +1,6 @@
 """Callbacks"""
 import logging
+from datetime import datetime, timezone, timedelta
 
 import dash_bootstrap_components as dbc
 from dash import Input, Output, Patch, State, get_app, no_update
@@ -316,6 +317,25 @@ class Callbacks:
         """
         log.info("Interval triggered %s", n_intervals)
         log.debug("store_data: %s", store_data)
+
+        ts_now = int(datetime.now(tz=timezone.utc).timestamp())
+        if store_data.get("auto_booking_ts"):
+            booking_start = store_data["auto_booking_ts"]
+            if ts_now - booking_start > int(config.MAX_BOOKING_DURATION_MIN / 60):
+                log.warning("Reached max auto booking duration. Stopping.")
+                store_data["auto_booking_ts"] = None
+                return (
+                    store_data,
+                    (
+                        "Status: Reached max auto booking duration of "
+                        f"{config.MAX_BOOKING_DURATION_MIN} min. "
+                        "Disable and enable auto booking to keep looking for a ride."
+                    ),
+                    True,
+                )
+        else:
+            store_data["auto_booking_ts"] = ts_now
+
         locations = Locations(store_data)
         try:
             booking = locations.start_booking_process()

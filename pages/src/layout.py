@@ -181,7 +181,7 @@ class Layout:
         layout = dbc.Form(
             id="radar_control_form",
             children=[
-                html.H5("Click on the map to set radar location"),
+                dbc.Label("Click on the map to set radar location", width="auto"),
                 html.Br(),
                 dbc.Row(
                     [
