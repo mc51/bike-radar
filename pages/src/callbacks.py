@@ -5,13 +5,14 @@ from datetime import datetime, timezone
 import dash_bootstrap_components as dbc
 from dash import Input, Output, Patch, State, get_app, no_update
 from dash._callback import NoUpdate
-from dash_leaflet import Map
+from dash_leaflet import GeoJSON, Map
 from requests import HTTPError
 
 from pages.src import config
 from pages.src.api import Api
 from pages.src.layout import Layout
 from pages.src.locations import Locations
+from pages.src.utils import create_bike_markers
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -79,6 +80,7 @@ class Callbacks:
             Output("store", "data", allow_duplicate=True),
             Output("booking_status_2", "children", allow_duplicate=True),
             Output("booking_status_3", "children", allow_duplicate=True),
+            Output("map_markers", "children"),
             Output("interval", "disabled", allow_duplicate=True),
             Input("interval", "n_intervals"),
             State("store", "data"),
@@ -311,7 +313,13 @@ class Callbacks:
 
     def cb_interval_triggered(
         self, n_intervals: int, store_data: dict
-    ) -> tuple[dict | NoUpdate, str | NoUpdate, str | NoUpdate, bool | NoUpdate]:
+    ) -> tuple[
+        dict | NoUpdate,
+        str | NoUpdate,
+        str | NoUpdate,
+        GeoJSON | NoUpdate,
+        bool | NoUpdate,
+    ]:
         """Interval triggered.
 
         Args:
@@ -322,10 +330,12 @@ class Callbacks:
             tuple[dict | NoUpdate,
                 str | NoUpdate,
                 str | NoUpdate,
+                GeoJSON | NoUpdate,
                 bool | NoUpdate]:
             store_data,
             booking status row 2,
             booking status row 3,
+            map markers children,
             disable interval
         """
         log.info("Interval triggered %s", n_intervals)
@@ -343,7 +353,7 @@ class Callbacks:
                     "Current booking remains active until it expires. "
                     "Disable and enable auto booking to keep looking for a ride. "
                 )
-                return store_data, no_update, status_row_3, True
+                return store_data, no_update, status_row_3, no_update, True
         else:
             store_data["auto_booking_ts"] = ts_now
 
@@ -352,8 +362,22 @@ class Callbacks:
             booking = locations.start_booking_process()
         except HTTPError as e:
             log.exception(e)
-            return no_update, f"Error booking bike: {e}", no_update, no_update
+            return (
+                no_update,
+                f"Error booking bike: {e}",
+                no_update,
+                no_update,
+                no_update,
+            )
         if booking:
             store_data["booked"] = booking.is_active
-            return store_data, booking.to_status(), no_update, no_update
-        return no_update, no_update, no_update, no_update
+            return (
+                store_data,
+                booking.to_status(),
+                no_update,
+                create_bike_markers(
+                    bikes=locations.bikes, city_id=store_data["city_id"]
+                ),
+                no_update,
+            )
+        return no_update, no_update, no_update, no_update, no_update

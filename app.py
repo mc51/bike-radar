@@ -27,7 +27,7 @@ app = Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.YETI],
     meta_tags=[{"name": "description", "content": DESCRIPTION}],
-    serve_locally=DEBUG,  # In production use CDN to serve dash js and css
+    # serve_locally=DEBUG,  # In production use CDN to serve dash js and css
 )
 server = app.server
 app.layout = html.Div(

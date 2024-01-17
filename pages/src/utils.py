@@ -1,6 +1,29 @@
 """Utilities"""
 from logging import Formatter
 import re
+from dash_leaflet import GeoJSON
+from dash_leaflet.express import dicts_to_geojson
+
+
+def create_bike_markers(bikes: list[dict], city_id: int) -> GeoJSON:
+    """Create clustered geo json markers for bike locations in city.
+
+    Args:
+        bikes (list[dict]): bikes
+        city_id (int): city id
+
+    Returns:
+        GeoJSON: bike markers
+    """
+    bikes = [
+        {"lat": b["lat"], "lon": b["lng"]} for b in bikes if b["city_id"] == city_id
+    ]
+    child = GeoJSON(
+        data=dicts_to_geojson(bikes),
+        cluster=True,
+        superClusterOptions={"radius": 10},
+    )
+    return child
 
 
 class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods

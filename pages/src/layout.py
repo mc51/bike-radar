@@ -6,11 +6,11 @@ import dash_bootstrap_components as dbc
 import dash_leaflet
 from dash import dcc, html
 from dash_extensions.javascript import assign
-from dash_leaflet import GeoJSON, Map, TileLayer
-from dash_leaflet.express import dicts_to_geojson
+from dash_leaflet import LayerGroup, Map, TileLayer
 
 from pages.src import config
 from pages.src.locations import Locations
+from pages.src.utils import create_bike_markers
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -224,24 +224,6 @@ class Layout:
         )
         return layout
 
-    def create_geojson_bike_markers(self, city_id: int) -> GeoJSON:
-        """Create clustered geo json markers for bike locations in city.
-
-        Returns:
-            GeoJSON: bike markers
-        """
-        bikes = [
-            {"lat": b["lat"], "lon": b["lng"]}
-            for b in self.locations.bikes
-            if b["city_id"] == city_id
-        ]
-        child = GeoJSON(
-            data=dicts_to_geojson(bikes),
-            cluster=True,
-            superClusterOptions={"radius": 100},
-        )
-        return child
-
     def create_map_layout(
         self, lat: float, lon: float, zoom: int, radius: int, city_id: int
     ) -> Map:
@@ -268,8 +250,11 @@ class Layout:
                     fillOpacity=0.5,
                     stroke=False,
                 ),
-            ]
-            + [self.create_geojson_bike_markers(city_id)],
+                LayerGroup(
+                    create_bike_markers(bikes=self.locations.bikes, city_id=city_id),
+                    id="map_markers",
+                ),
+            ],
             eventHandlers=self.MAP_CLICK_HANDLER,
             style={"height": "50vh"},
             center=[lat, lon],
