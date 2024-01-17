@@ -13,7 +13,7 @@ log.setLevel(config.LOG_LEVEL)
 MAX_BIKES = config.MAX_BIKES
 
 
-class Bookings:  # pylint: disable=too-many-instance-attributes
+class Booking:  # pylint: disable=too-many-instance-attributes
     """Booking"""
 
     id: int

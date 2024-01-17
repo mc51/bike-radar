@@ -251,7 +251,9 @@ class Layout:
                     stroke=False,
                 ),
                 LayerGroup(
-                    create_bike_markers(bikes=self.locations.bikes, city_id=city_id),
+                    children=create_bike_markers(
+                        bikes=self.locations.bikes, city_id=city_id
+                    ),
                     id="map_markers",
                 ),
             ],

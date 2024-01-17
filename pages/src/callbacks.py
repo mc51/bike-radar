@@ -317,7 +317,7 @@ class Callbacks:
         dict | NoUpdate,
         str | NoUpdate,
         str | NoUpdate,
-        GeoJSON | NoUpdate,
+        list | NoUpdate,
         bool | NoUpdate,
     ]:
         """Interval triggered.
@@ -330,7 +330,7 @@ class Callbacks:
             tuple[dict | NoUpdate,
                 str | NoUpdate,
                 str | NoUpdate,
-                GeoJSON | NoUpdate,
+                list | NoUpdate,
                 bool | NoUpdate]:
             store_data,
             booking status row 2,
@@ -376,7 +376,9 @@ class Callbacks:
                 booking.to_status(),
                 no_update,
                 create_bike_markers(
-                    bikes=locations.bikes, city_id=store_data["city_id"]
+                    bikes=locations.bikes,
+                    city_id=store_data["city_id"],
+                    current_booking=booking,
                 ),
                 no_update,
             )
