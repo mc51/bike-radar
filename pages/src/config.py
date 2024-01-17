@@ -2,7 +2,7 @@
 import os
 
 # General
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 APP_NAME = "Bike Radar"
 DB_NAME = "bikeradar.db"

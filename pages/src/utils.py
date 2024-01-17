@@ -8,7 +8,7 @@ class RedactingFormatter(Formatter):  # pylint: disable=too-few-public-methods
 
     def __init__(self, orig_formatter):  # pylint: disable=super-init-not-called
         self.orig_formatter = orig_formatter
-        self.patterns = ["mobile", "loginkey", "login_key", "pin"]
+        self.patterns = ["email", "mobile", "loginkey", "login_key", "pin"]
 
     def format(self, record) -> str:
         """Format record by replacing all values of keys corresponding to pattern.

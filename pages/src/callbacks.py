@@ -78,6 +78,7 @@ class Callbacks:
         self.app.callback(
             Output("store", "data", allow_duplicate=True),
             Output("booking_status_2", "children", allow_duplicate=True),
+            Output("booking_status_3", "children", allow_duplicate=True),
             Output("interval", "disabled", allow_duplicate=True),
             Input("interval", "n_intervals"),
             State("store", "data"),
@@ -89,6 +90,7 @@ class Callbacks:
                 Output("store", "data", allow_duplicate=True),
                 Output("booking_status_1", "children", allow_duplicate=True),
                 Output("booking_status_2", "children", allow_duplicate=True),
+                Output("booking_status_3", "children", allow_duplicate=True),
                 Output("booking_button", "children"),
                 Output("booking_button", "color"),
                 Output("booking_spinner", "spinner_style"),
@@ -229,6 +231,7 @@ class Callbacks:
         dict | NoUpdate,
         dbc.Alert,
         str | NoUpdate,
+        str | NoUpdate | None,
         str | NoUpdate,
         str | NoUpdate,
         dict | NoUpdate,
@@ -242,12 +245,15 @@ class Callbacks:
 
         Returns:
             tuple[dict | NoUpdate,
-                dbc.Alert, str | NoUpdate,
-                str | NoUpdate, str | NoUpdate,
+                dbc.Alert,
+                str | NoUpdate,
+                str | NoUpdate | None,
+                str | NoUpdate,
+                str | NoUpdate,
                 dict | NoUpdate,
                 bool | NoUpdate]:
             store data,
-            booking status 1 children, booking status 2 children,
+            booking status 1 children, booking status 2 children, booking status 3 children,
             booking button children, color,
             booking_spinner style, disable interval
         """
@@ -267,6 +273,7 @@ class Callbacks:
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
         if store_data.get("enabled"):
             # is enabled, so toggle off
@@ -279,6 +286,7 @@ class Callbacks:
                     duration=self.STATUS_MSG_DURATION,
                 ),
                 no_update,
+                None,
                 "Enable auto booking",
                 "success",
                 {"opacity": 0},  # hide spinner
@@ -294,6 +302,7 @@ class Callbacks:
                 duration=self.STATUS_MSG_DURATION,
             ),
             "Status: Please wait. Retrieving current status",
+            None,
             "Disable auto booking",
             "danger",
             {"opacity": 1},  # show spinner
@@ -302,7 +311,7 @@ class Callbacks:
 
     def cb_interval_triggered(
         self, n_intervals: int, store_data: dict
-    ) -> tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]:
+    ) -> tuple[dict | NoUpdate, str | NoUpdate, str | NoUpdate, bool | NoUpdate]:
         """Interval triggered.
 
         Args:
@@ -310,9 +319,13 @@ class Callbacks:
             store_data (dict): store_data
 
         Returns:
-            tuple[dict | NoUpdate, str | NoUpdate, bool | NoUpdate]:
+            tuple[dict | NoUpdate,
+                str | NoUpdate,
+                str | NoUpdate,
+                bool | NoUpdate]:
             store_data,
-            booking status 2,
+            booking status row 2,
+            booking status row 3,
             disable interval
         """
         log.info("Interval triggered %s", n_intervals)
@@ -324,15 +337,13 @@ class Callbacks:
             if ts_now - booking_start > int(config.MAX_BOOKING_DURATION_MIN * 60):
                 log.warning("Reached max auto booking duration. Stopping.")
                 store_data["auto_booking_ts"] = None
-                return (
-                    store_data,
-                    (
-                        "Status: Reached max auto booking duration of "
-                        f"{config.MAX_BOOKING_DURATION_MIN} min. "
-                        "Disable and enable auto booking to keep looking for a ride."
-                    ),
-                    True,
+                status_row_3 = (
+                    "Reached max auto booking duration of "
+                    f"{config.MAX_BOOKING_DURATION_MIN} min. "
+                    "Current booking remains active until it expires. "
+                    "Disable and enable auto booking to keep looking for a ride. "
                 )
+                return store_data, no_update, status_row_3, True
         else:
             store_data["auto_booking_ts"] = ts_now
 
@@ -341,8 +352,8 @@ class Callbacks:
             booking = locations.start_booking_process()
         except HTTPError as e:
             log.exception(e)
-            return no_update, f"Error booking bike: {e}", no_update
+            return no_update, f"Error booking bike: {e}", no_update, no_update
         if booking:
             store_data["booked"] = booking.is_active
-            return store_data, booking.to_status(), no_update
-        return no_update, no_update, no_update
+            return store_data, booking.to_status(), no_update, no_update
+        return no_update, no_update, no_update, no_update

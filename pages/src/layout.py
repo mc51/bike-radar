@@ -73,6 +73,7 @@ class Layout:
                         html.Br(),
                         html.Div(id="booking_status_1"),
                         html.Div(id="booking_status_2"),
+                        html.Div(id="booking_status_3"),
                         html.Br(),
                     ],
                 ),
@@ -185,7 +186,7 @@ class Layout:
                 html.Br(),
                 dbc.Row(
                     [
-                        dbc.Label("Set radar radius (m)", width="auto"),
+                        dbc.Label("Set radius (m)", width="auto"),
                         dbc.Col(
                             dcc.Slider(
                                 self.MIN_RADAR_RADIUS,
