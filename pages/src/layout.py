@@ -224,13 +224,17 @@ class Layout:
         )
         return layout
 
-    def create_geojson_bike_markers(self) -> GeoJSON:
+    def create_geojson_bike_markers(self, city_id: int) -> GeoJSON:
         """Create clustered geo json markers from bike locations.
 
         Returns:
             GeoJSON: bike markers
         """
-        bikes = [{"lat": b["lat"], "lon": b["lng"]} for b in self.locations.bikes]
+        bikes = [
+            {"lat": b["lat"], "lon": b["lng"]}
+            for b in self.locations.bikes
+            if b["city_id"] == city_id
+        ]
         child = GeoJSON(
             data=dicts_to_geojson(bikes),
             cluster=True,
@@ -265,9 +269,9 @@ class Layout:
                     stroke=False,
                 ),
             ]
-            + [self.create_geojson_bike_markers()],
+            + [self.create_geojson_bike_markers(city_id)],
             eventHandlers=self.MAP_CLICK_HANDLER,
-            style={"height": "450px"},
+            style={"height": "50vh"},
             center=[lat, lon],
             zoom=zoom,
             id="map",
