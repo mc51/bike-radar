@@ -6,7 +6,8 @@ import dash_bootstrap_components as dbc
 import dash_leaflet
 from dash import dcc, html
 from dash_extensions.javascript import assign
-from dash_leaflet import Map, TileLayer
+from dash_leaflet import GeoJSON, Map, TileLayer
+from dash_leaflet.express import dicts_to_geojson
 
 from pages.src import config
 from pages.src.locations import Locations
@@ -223,26 +224,19 @@ class Layout:
         )
         return layout
 
-    def create_bike_markers(self, city_id: int | None = None) -> list:
-        """Create markers from bike locations.
+    def create_geojson_bike_markers(self) -> GeoJSON:
+        """Create clustered geo json markers from bike locations.
 
         Returns:
-            list: markers
+            GeoJSON: bike markers
         """
-        markers = []
-        for bike in self.locations.bikes:
-            markers.append(
-                dash_leaflet.CircleMarker(
-                    center=[bike["lat"], bike["lng"]],
-                    fillColor="#004a99",
-                    fillOpacity=0.4,
-                    interactive=False,
-                    radius=6,
-                    stroke=False,
-                )
-            )
-        log.debug("Marker locations %s", markers[0:5])
-        return markers
+        bikes = [{"lat": b["lat"], "lon": b["lng"]} for b in self.locations.bikes]
+        child = GeoJSON(
+            data=dicts_to_geojson(bikes),
+            cluster=True,
+            superClusterOptions={"radius": 100},
+        )
+        return child
 
     def create_map_layout(
         self, lat: float, lon: float, zoom: int, radius: int, city_id: int
@@ -271,9 +265,9 @@ class Layout:
                     stroke=False,
                 ),
             ]
-            + self.create_bike_markers(city_id),
+            + [self.create_geojson_bike_markers()],
             eventHandlers=self.MAP_CLICK_HANDLER,
-            style={"height": "500px"},
+            style={"height": "450px"},
             center=[lat, lon],
             zoom=zoom,
             id="map",
