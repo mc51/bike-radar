@@ -1,6 +1,6 @@
 """Callbacks"""
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 import dash_bootstrap_components as dbc
 from dash import Input, Output, Patch, State, get_app, no_update

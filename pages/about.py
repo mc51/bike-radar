@@ -2,7 +2,12 @@
 import dash
 from dash import html
 
-from pages.src.config import DESCRIPTION, GITHUB_REPO_URL, APP_NAME
+from pages.src.config import (
+    DESCRIPTION,
+    GITHUB_REPO_URL,
+    APP_NAME,
+    MAX_BOOKING_DURATION_MIN,
+)
 
 
 dash.register_page(__name__, title=f"{APP_NAME} - About", description=DESCRIPTION)
@@ -12,29 +17,40 @@ layout = html.Div(
     [
         html.H5(DESCRIPTION),
         html.Br(),
-        html.H2("""How to use?"""),
+        html.H2("How to get started?"),
         html.P(
             """To get started, select the city you want to book a bike in.
             Then, login to your Nextbike account (use same credentials as in
             the Nextbike App). Following, set your desired location by clicking
             on the map and adjust the radius of the area in which to look for
             bikes. Finally, enable the auto booking feature to activate the
-            radar."""
+            radar. Don't navigate away or refresh the site, as this will
+            log you out. However, to select a new city, just refresh the site
+            and login again."""
         ),
+        html.Br(),
+        html.H2("What does auto booking do?"),
         html.P(
-            """As soon as a bike in your area becomes available it will
-            automatically be booked.
+            f"""When you enable auto booking, the nearest bike in your
+            search area will be automatically booked. If no bike is readily
+            available, the radar will continue to look for bikes.
+            As soon as a bike in your area becomes available it will be booked.
             The distance to the bike, its identifier and the duration of your
             booking will be displayed in the status.
-            If a nearer bike become available in the meantime, your booking
-            will be changed.
-            """
+            If a nearer bike become available while auto booking is active,
+            it will be booked instead. Auto booking is automatically disabled
+            after {MAX_BOOKING_DURATION_MIN} minutes to avoid misuse. You
+            can turn it back on to keep looking for bikes."""
         ),
+        html.Br(),
+        html.H2("What to after a booking?"),
         html.P(
-            """A booking will become visible in your Nextbike App as well.
-            Use the app to cancel it or navigate to your booked bike in order
-            to rent it. Turn off the auto booking feature after a bike has been
-            booked for you. Your booking remains active until it expires or
+            f"""A booking from {APP_NAME} will become visible in your Nextbike
+            App as well. Use the Nextbike app to cancel it or navigate to your
+            booked bike in order to rent it.
+            Turn off the auto booking feature after a bike has been booked for
+            you that you want to rent, so no other (closer) bike will be booked
+            in the meantime. Your booking remains active until it expires or
             your rent the bike.
             """
         ),
@@ -44,8 +60,6 @@ layout = html.Div(
             f"""{APP_NAME} is using the API of the Nextbike app to take
             automatic actions for you. It regularly refreshes the location of
             nearby bikes and looks for them within the set search area.
-            If bikes become available within the search area, the closest one
-            will automatically be booked (i.e. reserved, but not rented).
             For technical details and the source code, check out the GitHub
             repo linked below.
             """
