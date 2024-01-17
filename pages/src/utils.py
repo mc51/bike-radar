@@ -21,7 +21,7 @@ def create_bike_markers(bikes: list[dict], city_id: int) -> GeoJSON:
     child = GeoJSON(
         data=dicts_to_geojson(bikes),
         cluster=True,
-        superClusterOptions={"radius": 10},
+        superClusterOptions={"radius": 100},
     )
     return child
 
