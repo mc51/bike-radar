@@ -43,7 +43,7 @@ layout = html.Div(
             can turn it back on to keep looking for bikes."""
         ),
         html.Br(),
-        html.H2("What to after a booking?"),
+        html.H2("What to do after a booking?"),
         html.P(
             f"""A booking from {APP_NAME} will become visible in your Nextbike
             App as well. Use the Nextbike app to cancel it or navigate to your

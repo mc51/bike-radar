@@ -225,7 +225,7 @@ class Layout:
         return layout
 
     def create_geojson_bike_markers(self, city_id: int) -> GeoJSON:
-        """Create clustered geo json markers from bike locations.
+        """Create clustered geo json markers for bike locations in city.
 
         Returns:
             GeoJSON: bike markers
@@ -245,7 +245,7 @@ class Layout:
     def create_map_layout(
         self, lat: float, lon: float, zoom: int, radius: int, city_id: int
     ) -> Map:
-        """Create map layout for location / city.
+        """Create map layout for selected city.
 
         Args:
             lat (float): map center lat
