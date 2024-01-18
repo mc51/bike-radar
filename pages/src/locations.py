@@ -7,7 +7,7 @@ import geopy.distance  # type: ignore
 
 from pages.src import config
 from pages.src.api import Api
-from pages.src.bookings import Bookings
+from pages.src.bookings import Booking
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -212,7 +212,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             dict | None: booking status
         """
         log.info("Booking bike %s.", place_id)
-        current_booking = Bookings(self.api, self.store_data)
+        current_booking = Booking(self.api, self.store_data)
         if current_booking.is_active:
             log.info("There already is an active booking. Canceling it first.")
             if not self.cancel_booking(booking_id=current_booking.id):
@@ -236,7 +236,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             bool: is booked
         """
-        booking = Bookings(self.api, self.store_data)
+        booking = Booking(self.api, self.store_data)
         if booking.distance and bike["distance"] >= booking.distance:
             log.info(
                 "Bike distance %s not closer than current booking %s.",
@@ -258,7 +258,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             log.warning("Bike can only be rented but not booked.")
         return False
 
-    def start_booking_process(self) -> Bookings:
+    def start_booking_process(self) -> Booking:
         """Start booking process. Use store data to recreate client state.
 
         Returns:
@@ -286,4 +286,4 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             log.info("Bike should not be booked.")
         else:
             log.info("No (new) bikes booked.")
-        return Bookings(self.api)
+        return Booking(self.api, self.store_data)

@@ -1,9 +1,10 @@
 """Configuration"""
+import os
 
 # General
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 APP_NAME = "Bike Radar"
-LOG_LEVEL = "DEBUG"
 DB_NAME = "bikeradar.db"
 DB_TABLE = "bikes"
 CLAIM = "Book your nearby Nextbike ride the moment it appears!"
@@ -20,7 +21,7 @@ DEFAULT_RADAR_RADIUS = 800
 RADAR_RADIUS_STEP = 250
 FRONTEND_REFRESH_INTERVAL = 1000 * 30  # in ms
 STATUS_MSG_DURATION = 1000 * 4  # in ms
-MAX_BOOKING_DURATION = 60 * 15  # in s
+MAX_BOOKING_DURATION_MIN = 20
 
 # API
 API_KEY = "rXXqTgQZUPZ89lzB"

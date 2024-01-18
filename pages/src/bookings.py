@@ -13,7 +13,7 @@ log.setLevel(config.LOG_LEVEL)
 MAX_BIKES = config.MAX_BIKES
 
 
-class Bookings:  # pylint: disable=too-many-instance-attributes
+class Booking:  # pylint: disable=too-many-instance-attributes
     """Booking"""
 
     id: int
@@ -102,13 +102,11 @@ class Bookings:  # pylint: disable=too-many-instance-attributes
         Returns:
             str: status
         """
-        msg = "You have no active bookings"
+        msg = "You have no active bookings. "
         if self.is_active:
             # todo: get timezone from user account and display in local time
             until = datetime.fromtimestamp(
                 self.start_time + self.bike_blocking_time_seconds, tz=timezone.utc
             )
-            msg = (
-                f"Booked {self.place_name} in {self.distance} m distance until {until}."
-            )
+            msg = f"Booked {self.place_name} in {self.distance} m distance until {until}. "
         return f"Status: {msg}"

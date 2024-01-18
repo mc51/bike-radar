@@ -6,10 +6,11 @@ import dash_bootstrap_components as dbc
 import dash_leaflet
 from dash import dcc, html
 from dash_extensions.javascript import assign
-from dash_leaflet import Map, TileLayer
+from dash_leaflet import LayerGroup, Map, TileLayer
 
 from pages.src import config
 from pages.src.locations import Locations
+from pages.src.utils import create_bike_markers
 
 log = logging.getLogger(__name__)
 log.setLevel(config.LOG_LEVEL)
@@ -73,6 +74,7 @@ class Layout:
                         html.Br(),
                         html.Div(id="booking_status_1"),
                         html.Div(id="booking_status_2"),
+                        html.Div(id="booking_status_3"),
                         html.Br(),
                     ],
                 ),
@@ -181,11 +183,11 @@ class Layout:
         layout = dbc.Form(
             id="radar_control_form",
             children=[
-                html.H5("Click on the map to set radar location"),
+                dbc.Label("Click on the map to set radar location", width="auto"),
                 html.Br(),
                 dbc.Row(
                     [
-                        dbc.Label("Set radar radius (m)", width="auto"),
+                        dbc.Label("Set radius (m)", width="auto"),
                         dbc.Col(
                             dcc.Slider(
                                 self.MIN_RADAR_RADIUS,
@@ -222,31 +224,10 @@ class Layout:
         )
         return layout
 
-    def create_bike_markers(self, city_id: int | None = None) -> list:
-        """Create markers from bike locations.
-
-        Returns:
-            list: markers
-        """
-        markers = []
-        for bike in self.locations.bikes:
-            markers.append(
-                dash_leaflet.CircleMarker(
-                    center=[bike["lat"], bike["lng"]],
-                    fillColor="#004a99",
-                    fillOpacity=0.4,
-                    interactive=False,
-                    radius=6,
-                    stroke=False,
-                )
-            )
-        log.debug("Marker locations %s", markers[0:5])
-        return markers
-
     def create_map_layout(
         self, lat: float, lon: float, zoom: int, radius: int, city_id: int
     ) -> Map:
-        """Create map layout for location / city.
+        """Create map layout for selected city.
 
         Args:
             lat (float): map center lat
@@ -269,10 +250,15 @@ class Layout:
                     fillOpacity=0.5,
                     stroke=False,
                 ),
-            ]
-            + self.create_bike_markers(city_id),
+                LayerGroup(
+                    children=create_bike_markers(
+                        bikes=self.locations.bikes, city_id=city_id
+                    ),
+                    id="map_markers",
+                ),
+            ],
             eventHandlers=self.MAP_CLICK_HANDLER,
-            style={"height": "500px"},
+            style={"height": "50vh"},
             center=[lat, lon],
             zoom=zoom,
             id="map",
