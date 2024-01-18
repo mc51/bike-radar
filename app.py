@@ -7,7 +7,7 @@ from dash import Dash, html
 
 from pages.src.config import DEBUG, APP_NAME, DESCRIPTION
 from pages.src.callbacks import Callbacks
-from pages.src.utils import RedactingFormatter
+from pages.src.utils import RedactingFormatter, get_version
 
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s %(message).400s",
@@ -27,7 +27,6 @@ app = Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.YETI],
     meta_tags=[{"name": "description", "content": DESCRIPTION}],
-    # serve_locally=DEBUG,  # In production use CDN to serve dash js and css
 )
 server = app.server
 app.layout = html.Div(
@@ -49,6 +48,10 @@ app.layout = html.Div(
         html.Br(),
         dash.page_container,
         html.Br(),
+        html.P(
+            f"Site version: {get_version()}",
+            style={"color": "grey", "font-size": "small", "text-align": "center"},
+        ),
     ],
     className="mycontent",
     style={"height": "100%", "margin": "auto"},

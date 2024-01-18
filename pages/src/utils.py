@@ -1,11 +1,27 @@
 """Utilities"""
 import re
 from logging import Formatter
+from pathlib import Path
 
 from dash_leaflet import GeoJSON, Marker
 from dash_leaflet.express import dicts_to_geojson
 
 from pages.src.bookings import Booking
+
+
+def get_version() -> str:
+    """Get version of from pyproject.toml file.
+
+    Returns:
+        str: version
+    """
+    version = "0.1.0"
+    lines = Path("pyproject.toml").read_text(encoding="utf8").splitlines()
+    for line in lines:
+        if "version" in line:
+            version = re.findall(r'"([^"]*)"', line)[0]
+            break
+    return version
 
 
 def create_bike_markers(
@@ -40,6 +56,7 @@ def create_bike_markers(
 
     available_bikes = GeoJSON(
         data=dicts_to_geojson(bikes),
+        interactive=False,
         cluster=True,
         superClusterOptions={"radius": 100},
     )
