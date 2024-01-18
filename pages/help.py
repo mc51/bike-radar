@@ -21,19 +21,15 @@ layout = html.Div(
         ),
         html.Br(),
         html.H2("""Known limitations"""),
-        html.Li("App can be slow, especially on mobile devices"),
         html.Li('Only "free floating" bikes are supported'),
         html.Li("Bookings cannot be canceled"),
-        html.Li("Location of booked bike is not displayed on map"),
         html.Li(
             "If your provider, location or account type don't support booking "
             "(reserving) bikes, you'll receive errors or it simply won't work"
         ),
         html.Br(),
         html.H2("""Planned features"""),
-        html.Li("Improve server and client side speed"),
         html.Li("Support bike stations"),
-        html.Li("Show location of booked bike on map"),
         html.Br(),
         html.A("Find the source code here", href=GITHUB_REPO_URL),
         html.Br(),

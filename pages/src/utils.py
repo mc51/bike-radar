@@ -2,7 +2,7 @@
 import re
 from logging import Formatter
 
-from dash_leaflet import GeoJSON, CircleMarker
+from dash_leaflet import GeoJSON, Marker
 from dash_leaflet.express import dicts_to_geojson
 
 from pages.src.bookings import Booking
@@ -10,7 +10,7 @@ from pages.src.bookings import Booking
 
 def create_bike_markers(
     bikes: list[dict], city_id: int, current_booking: Booking | None = None
-) -> list[GeoJSON | CircleMarker | None]:
+) -> list[GeoJSON | Marker | None]:
     """Create clustered geo json markers for bike locations in city.
 
     Args:
@@ -19,17 +19,25 @@ def create_bike_markers(
         current_booking (Booking | None): current booking. Defaults to None.
 
     Returns:
-        list[GeoJSON | CircleMarker | None]: markers
+        list[GeoJSON | Marker | None]: markers
     """
     booked_bike = None
     if current_booking:
-        lat = current_booking.lat
-        lon = current_booking.lng
-        booked_bike = CircleMarker(center=[lat, lon], radius=50)
+        booked_bike = Marker(
+            position=[current_booking.lat, current_booking.lng],
+            icon={
+                "iconUrl": "/assets/red_pin.webp",
+                "iconSize": [56, 79],
+                "iconAnchor": [28, 79],
+                "zIndexOffset": 100,
+            },
+            title=f"Booked bike: {current_booking.place_name}",
+        )
 
     bikes = [
         {"lat": b["lat"], "lon": b["lng"]} for b in bikes if b["city_id"] == city_id
     ]
+
     available_bikes = GeoJSON(
         data=dicts_to_geojson(bikes),
         cluster=True,
