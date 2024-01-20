@@ -51,8 +51,8 @@ class Layout:
                     [
                         html.Img(
                             src="/assets/logo.png",
+                            className="logo",
                             id="logo",
-                            height="300vh",
                             hidden=False,
                             style={
                                 "margin-left": "auto",

@@ -3,6 +3,10 @@
     .mycontent {
         width: 45%;
     }
+
+    .logo {
+        height: 30vh;
+    }
 }
 
 /*###Tablet(medium)###*/
@@ -10,11 +14,19 @@
     .mycontent {
         width: 60%;
     }
+
+    .logo {
+        height: 25vh;
+    }
 }
 
 /*### Smartphones (portrait and landscape)(small)### */
 @media screen and (min-width : 0px) and (max-width : 767px) {
     .mycontent {
         width: 90%;
+    }
+
+    .logo {
+        height: 20vh;
     }
 }
