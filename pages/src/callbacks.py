@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import dash_bootstrap_components as dbc
 from dash import Input, Output, Patch, State, get_app, no_update
 from dash._callback import NoUpdate
-from dash_leaflet import GeoJSON, Map
+from dash_leaflet import Map
 from requests import HTTPError
 
 from pages.src import config
@@ -55,6 +55,7 @@ class Callbacks:
             Output("map_div", "children"),
             Output("city_select_div", "hidden"),
             Output("login_div", "hidden", allow_duplicate=True),
+            Output("logo", "hidden"),
             Input("city_select_button", "n_clicks"),
             State("city_select_dropdown", "value"),
             prevent_initial_call=True,
@@ -105,18 +106,19 @@ class Callbacks:
             prevent_initial_call=True,
         )(self.toggle_auto_booking)
 
-    def cb_select_city(self, _, city: str) -> tuple[dict, Map, bool, bool]:
+    def cb_select_city(self, _, city: str) -> tuple[dict, Map, bool, bool, bool]:
         """Select city to show on map. Display login after selection.
 
         Args:
             city (str): city name
 
         Returns:
-            tuple[dict, Map, bool, bool]:
+            tuple[dict, Map, bool, bool, bool]:
                 store data,
                 map div children,
                 city_select_div hidden,
                 login_div hidden
+                logo hidden
         """
         locations = Locations()
         selected_city = locations.get_city_from_name(city)
@@ -131,7 +133,7 @@ class Callbacks:
         store_data = kwargs.copy()
         store_data["timezone"] = tz
         log.debug("Selected: %s", store_data)
-        return store_data, Layout().create_map_layout(**kwargs), True, False
+        return store_data, Layout().create_map_layout(**kwargs), True, False, True
 
     def cb_check_login(
         self, _, phone: str, pin: int

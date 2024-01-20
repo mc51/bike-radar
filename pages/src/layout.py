@@ -49,6 +49,17 @@ class Layout:
             [
                 html.Div(
                     [
+                        html.Img(
+                            src="/assets/logo.png",
+                            id="logo",
+                            height="300vh",
+                            hidden=False,
+                            style={
+                                "margin-left": "auto",
+                                "margin-right": "auto",
+                                "display": "block",
+                            },
+                        ),
                         html.Div(
                             self.create_city_select_layout(),
                             id="city_select_div",
