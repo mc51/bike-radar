@@ -13,6 +13,7 @@ It secures nearby rides for you by booking them as soon as they
 become available in your selected area."""
 GITHUB_REPO_URL = "https://github.com/mc51/bike-radar"
 MAX_BIKES = 3
+BOOKING_TIME_FORMAT = r"%H:%M"
 
 # Map
 MIN_RADAR_RADIUS = 100

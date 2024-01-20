@@ -120,15 +120,18 @@ class Callbacks:
         """
         locations = Locations()
         selected_city = locations.get_city_from_name(city)
-        store_data = {
+        tz = locations.get_timezone_for_city(selected_city["uid"])
+        kwargs = {
             "lat": selected_city["lat"],
             "lon": selected_city["lng"],
             "zoom": selected_city["zoom"],
             "city_id": selected_city["uid"],
             "radius": self.DEFAULT_RADAR_RADIUS,
         }
-        log.info("Selected: %s", store_data)
-        return store_data, Layout().create_map_layout(**store_data), True, False
+        store_data = kwargs.copy()
+        store_data["timezone"] = tz
+        log.debug("Selected: %s", store_data)
+        return store_data, Layout().create_map_layout(**kwargs), True, False
 
     def cb_check_login(
         self, _, phone: str, pin: int
@@ -146,7 +149,7 @@ class Callbacks:
                 alert text, alert color, alert is_open,
                 radar div hidden, login div hidden
         """
-        log.info("Checking login credentials.")
+        log.debug("Checking login credentials.")
         if not phone or not pin:
             return (
                 no_update,
@@ -218,7 +221,7 @@ class Callbacks:
         if not coords:
             # Bc we create the Map object dynamically, this will be triggered
             # catch that case without failing
-            log.info("No coord set yet.")
+            log.debug("No coord set yet.")
             return no_update, no_update
 
         store_data["lat"] = round(coords[0], 5)
@@ -259,10 +262,10 @@ class Callbacks:
             booking button children, color,
             booking_spinner style, disable interval
         """
-        log.info("Enable auto booking button triggered %s", n_clicks)
+        log.debug("Enable auto booking button triggered %s", n_clicks)
         log.debug(store_data)
         if not store_data or not store_data.get("lat"):
-            log.info("Not set store_data yet")
+            log.debug("Not set store_data yet")
             return (
                 no_update,
                 dbc.Alert(
@@ -338,7 +341,7 @@ class Callbacks:
             map markers children,
             disable interval
         """
-        log.info("Interval triggered %s", n_intervals)
+        log.debug("Interval triggered %s", n_intervals)
         log.debug("store_data: %s", store_data)
 
         ts_now = int(datetime.now(tz=timezone.utc).timestamp())
