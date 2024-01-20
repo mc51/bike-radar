@@ -73,7 +73,22 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         self.cities = self.locations["cities"]
         self.places = self.locations["places"]
         self.cities_with_bikes = self.filter_for_cities_with_bikes(self.cities)
-        self.bikes = self.filter_places_for_bikes(self.places)
+        self.bikes = self.filter_for_places_with_bikes(self.places)
+
+    def get_timezone_for_city(self, city_id: int) -> str:
+        """Get timezone for city from countries information.
+
+        Args:
+            city_id (int): city id
+
+        Returns:
+            str: timezone
+        """
+        log.debug("Getting timezone for city id: %s.", city_id)
+        domain = [x["domain"] for x in self.cities if x["uid"] == city_id][0]
+        timezone = [x["timezone"] for x in self.countries if x["domain"] == domain][0]
+        log.debug("Domain: %s, Timezone: %s.", domain, timezone)
+        return timezone
 
     def get_timezone_for_city(self, city_id: int) -> str:
         """Get timezone for city from countries information.
@@ -128,8 +143,8 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         log.debug("Filtering for cities with bikes.")
         return [city for city in cities if city["available_bikes"] > 0]
 
-    def filter_places_for_bikes(self, places: list) -> list[dict]:
-        """Filter places for bikes only.
+    def filter_for_places_with_bikes(self, places: list) -> list[dict]:
+        """Filter for places with available bikes.
 
         Args:
             places (list): places
@@ -138,7 +153,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             list[dict]: places with bikes
         """
         log.debug("Filtering places for bikes only.")
-        return [place for place in places if place["bike"]]
+        return [p for p in places if p["bikes_available_to_rent"] > 0]
 
     def has_active_bookings(self, bookings) -> bool:
         """Check for active bookings.

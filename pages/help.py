@@ -1,15 +1,17 @@
 """Help page"""
 import dash
 from dash import html
-from pages.src.config import GITHUB_REPO_URL, APP_NAME
+from pages.src.config import GITHUB_REPO_URL, APP_NAME, DESCRIPTION, CLAIM
 
 
-dash.register_page(__name__, title=f"{APP_NAME} - Help")
+dash.register_page(
+    __name__, title=f"{APP_NAME} — {CLAIM} — Home", description=DESCRIPTION
+)
 
 layout = html.Div(
     [
         html.P(
-            """The app is currently still under heavy development.
+            """The app is currently still under development.
             There is no warranty, so it might become unavailable at any time.
             If that happens, just try again later. Reliability is increasing
             fast and new features are constantly added. If you find bugs or
@@ -21,15 +23,14 @@ layout = html.Div(
         ),
         html.Br(),
         html.H2("""Known limitations"""),
-        html.Li('Only "free floating" bikes are supported'),
         html.Li("Bookings cannot be canceled"),
         html.Li(
             "If your provider, location or account type don't support booking "
             "(reserving) bikes, you'll receive errors or it simply won't work"
         ),
-        html.Br(),
-        html.H2("""Planned features"""),
-        html.Li("Support bike stations"),
+        # html.Br(),
+        # html.H2("""Planned features"""),
+        # html.Li("Support bike stations"),
         html.Br(),
         html.A("Find the source code here", href=GITHUB_REPO_URL),
         html.Br(),

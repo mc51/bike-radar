@@ -6,7 +6,7 @@ from pages.src.layout import Layout
 from pages.src.config import DESCRIPTION, APP_NAME, CLAIM
 
 dash.register_page(
-    __name__, path="/", title=f"{APP_NAME} - Home", description=DESCRIPTION
+    __name__, path="/", title=f"{APP_NAME} — {CLAIM} — Home", description=DESCRIPTION
 )
 
 layout = html.Div(

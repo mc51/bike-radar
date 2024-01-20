@@ -26,7 +26,12 @@ app = Dash(
     use_pages=True,
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.YETI],
-    meta_tags=[{"name": "description", "content": DESCRIPTION}],
+    meta_tags=[
+        {
+            "description": DESCRIPTION,
+            "og:image": "/assets/logo.png",
+        }
+    ],
 )
 server = app.server
 app.layout = html.Div(

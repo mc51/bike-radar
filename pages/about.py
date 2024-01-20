@@ -7,11 +7,12 @@ from pages.src.config import (
     GITHUB_REPO_URL,
     APP_NAME,
     MAX_BOOKING_DURATION_MIN,
+    CLAIM,
 )
 
-
-dash.register_page(__name__, title=f"{APP_NAME} - About", description=DESCRIPTION)
-
+dash.register_page(
+    __name__, title=f"{APP_NAME} — {CLAIM} — About", description=DESCRIPTION
+)
 
 layout = html.Div(
     [
