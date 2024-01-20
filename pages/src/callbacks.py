@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import dash_bootstrap_components as dbc
 from dash import Input, Output, Patch, State, get_app, no_update
 from dash._callback import NoUpdate
-from dash_leaflet import Map
+from dash_leaflet import GeoJSON, Map
 from requests import HTTPError
 
 from pages.src import config
