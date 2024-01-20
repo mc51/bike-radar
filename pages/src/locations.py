@@ -41,7 +41,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             dict[str, list]: locations
         """
-        log.info("Getting all locations data.")
+        log.debug("Getting all locations data.")
         con = self.db_con
         try:
             with con:
@@ -50,7 +50,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         except sqlite3.Error:
             log.exception("ERROR: reading data from db.")
             raise
-        log.info("OK: read data from db.")
+        log.debug("OK: read data from db.")
         return json.loads(data[0])
 
     def get_bikes_in_city(self, city_id: int) -> list:
@@ -62,18 +62,33 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             list: places
         """
-        log.info("Getting bikes in city: %s.", city_id)
+        log.debug("Getting bikes in city: %s.", city_id)
         return [bike for bike in self.bikes if bike["city_id"] == city_id]
 
     def update_locations(self):
         """Update all locations data."""
-        log.info("Updating all locations data.")
+        log.debug("Updating all locations data.")
         self.locations = self.get_all_locations()
         self.countries = self.locations["countries"]
         self.cities = self.locations["cities"]
         self.places = self.locations["places"]
         self.cities_with_bikes = self.filter_for_cities_with_bikes(self.cities)
         self.bikes = self.filter_places_for_bikes(self.places)
+
+    def get_timezone_for_city(self, city_id: int) -> str:
+        """Get timezone for city from countries information.
+
+        Args:
+            city_id (int): city id
+
+        Returns:
+            str: timezone
+        """
+        log.debug("Getting timezone for city id: %s.", city_id)
+        domain = [x["domain"] for x in self.cities if x["uid"] == city_id][0]
+        timezone = [x["timezone"] for x in self.countries if x["domain"] == domain][0]
+        log.debug("Domain: %s, Timezone: %s.", domain, timezone)
+        return timezone
 
     def get_city_from_name(self, city: str) -> dict:
         """Get city by name.
@@ -84,7 +99,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             dict: city
         """
-        log.info("Getting city by name.")
+        log.debug("Getting city by name.")
         for c in self.cities:
             if c["name"] == city:
                 return c
@@ -96,7 +111,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             list[str]: names
         """
-        log.info("Getting city names.")
+        log.debug("Getting city names.")
         cities = self.cities_with_bikes
         return sorted([city["name"] for city in cities])
 
@@ -110,7 +125,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
             list[dict]: cities with bikes
         """
 
-        log.info("Filtering for cities with bikes.")
+        log.debug("Filtering for cities with bikes.")
         return [city for city in cities if city["available_bikes"] > 0]
 
     def filter_places_for_bikes(self, places: list) -> list[dict]:
@@ -122,7 +137,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             list[dict]: places with bikes
         """
-        log.info("Filtering places for bikes only.")
+        log.debug("Filtering places for bikes only.")
         return [place for place in places if place["bike"]]
 
     def has_active_bookings(self, bookings) -> bool:
@@ -131,14 +146,14 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             bool: True if active bookings, False if not
         """
-        log.info("Checking for active bookings.")
+        log.debug("Checking for active bookings.")
         if not bookings.get("items"):
-            log.info("No bookings found.")
+            log.debug("No bookings found.")
             return False
         if bookings["items"][-1]["state_id"] == 5:
-            log.info("Active bookings found.")
+            log.debug("Active bookings found.")
             return True
-        log.info("No active bookings found.")
+        log.debug("No active bookings found.")
         return False
 
     def get_near_bikes(self, radius: int, lat: float, lon: float, city_id: int) -> list:
@@ -153,7 +168,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             list: nearest bikes
         """
-        log.info(
+        log.debug(
             "Getting nearest bikes for lat %s lon %s within radius %s in city id %s.",
             lat,
             lon,
@@ -183,7 +198,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             dict: booking info
         """
-        log.info("Getting booking info for place %s.", place_id)
+        log.debug("Getting booking info for place %s.", place_id)
         info = self.api.request_booking_info(place_id=place_id)
         return info
 
@@ -196,7 +211,7 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         Returns:
             bool: is canceled
         """
-        log.info("Cancelling booking with id %s.", booking_id)
+        log.debug("Cancelling booking with id %s.", booking_id)
         response = self.api.request_booking_cancellation(booking_id=booking_id)
         if response.get("booking", {}).get("canceled"):
             return True
@@ -214,15 +229,15 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         log.info("Booking bike %s.", place_id)
         current_booking = Booking(self.api, self.store_data)
         if current_booking.is_active:
-            log.info("There already is an active booking. Canceling it first.")
+            log.debug("There already is an active booking. Canceling it first.")
             if not self.cancel_booking(booking_id=current_booking.id):
                 log.error("Could not cancel current booking.")
                 return None
-            log.info("Current booking cancelled.")
+            log.debug("Current booking cancelled.")
 
         booking = self.api.request_bike_booking(place_id=place_id)
         if booking.get("booking"):
-            log.info("Booking successful.")
+            log.debug("Booking successful.")
             return booking["booking"]
         log.warning("Booking could not be finished.")
         return None
@@ -238,13 +253,13 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         """
         booking = Booking(self.api, self.store_data)
         if booking.distance and bike["distance"] >= booking.distance:
-            log.info(
+            log.debug(
                 "Bike distance %s not closer than current booking %s.",
                 bike["distance"],
                 booking.distance,
             )
             return False
-        log.info(
+        log.debug(
             "Bike should be booked. Booking distance %s bike distance %s",
             booking.distance,
             bike["distance"],

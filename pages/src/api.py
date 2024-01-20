@@ -98,7 +98,7 @@ class Api:
         Returns:
             dict[str, list]: places
         """
-        log.info("Getting all locations. Filter on %s:", city_id)
+        log.debug("Getting all locations. Filter on %s:", city_id)
         params = {
             "api_key": self.API_KEY,
             "bikes": "0",

@@ -1,6 +1,7 @@
 """Booking stuff"""
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import geopy.distance  # type: ignore
 
@@ -27,6 +28,7 @@ class Booking:  # pylint: disable=too-many-instance-attributes
     state_id: int
     distance: int | None = None
     booked: bool = False
+    timezone: str = "UTC"
 
     def __init__(self, api: Api | None = None, store_data: dict | None = None):
         """
@@ -46,9 +48,14 @@ class Booking:  # pylint: disable=too-many-instance-attributes
                 setattr(self, key, value)
 
         if store_data and self.is_active:
-            log.info("Getting distance for current booking.")
+            self.timezone = store_data["timezone"]
             self.distance = self.get_distance_from_coords(
                 lat=store_data["lat"], lng=store_data["lon"]
+            )
+            log.debug(
+                "Distance and timezone for current booking: %s, %s",
+                self.distance,
+                self.timezone,
             )
 
     def get_distance_from_coords(self, lat: float, lng: float) -> int:
@@ -79,7 +86,7 @@ class Booking:  # pylint: disable=too-many-instance-attributes
         Returns:
             dict | None: booking
         """
-        log.info("Getting last booking.")
+        log.debug("Getting last booking.")
         bookings = self.get_bookings()
         if bookings.get("items"):
             return bookings["items"][-1]
@@ -104,9 +111,10 @@ class Booking:  # pylint: disable=too-many-instance-attributes
         """
         msg = "You have no active bookings. "
         if self.is_active:
-            # todo: get timezone from user account and display in local time
             until = datetime.fromtimestamp(
-                self.start_time + self.bike_blocking_time_seconds, tz=timezone.utc
+                self.start_time + self.bike_blocking_time_seconds,
+                tz=ZoneInfo(self.timezone),
             )
+            until = until.strftime(config.BOOKING_TIME_FORMAT)
             msg = f"Booked {self.place_name} in {self.distance} m distance until {until}. "
         return f"Status: {msg}"
