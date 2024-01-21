@@ -5,7 +5,7 @@
     }
 
     .logo {
-        height: 35vh;
+        width: 25vh;
     }
 }
 
@@ -16,7 +16,7 @@
     }
 
     .logo {
-        height: 30vh;
+        width: 25vh;
     }
 }
 
@@ -27,6 +27,6 @@
     }
 
     .logo {
-        height: 25vh;
+        width: 20vh;
     }
 }
