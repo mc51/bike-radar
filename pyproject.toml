@@ -1,6 +1,6 @@
 [project]
     name = "bike-radar"
-    description = "Bike Radar is a free and open source web app for Nextbike users. It secures nearby rides for you by booking them as soon as they become available in your selected area."
+    description = "Bike Radar is a free and open source app for Nextbike users. It secures nearby rides for you by booking them as soon as they become available in your selected area."
     readme = "README.md"
     requires-python = ">=3.9"
     license = "AGPL-3.0"
@@ -25,7 +25,7 @@
         "geopy==2.4.1",
         "gunicorn==21.2.0",
     ]
-    version = "0.2.2"
+    version = "0.2.3"
 
 [project.urls]
     Documentation = "https://github.com/mc51/bike-radar#readme"

@@ -76,7 +76,6 @@ class Layout:
                             fade=True,
                             duration=4000,
                         ),
-                        html.Br(),
                         html.Div(
                             self.create_radar_control_layout(),
                             id="radar_control_div",
