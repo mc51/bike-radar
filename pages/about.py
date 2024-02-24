@@ -1,4 +1,5 @@
 """Radar page"""
+
 import dash
 from dash import html
 
@@ -20,11 +21,11 @@ layout = html.Div(
         html.Br(),
         html.H2("How to get started?"),
         html.P(
-            """To get started, select the city you want to book a bike in.
-            Then, login to your Nextbike account (use same credentials as in
-            the Nextbike App). Following, set your desired location by clicking
-            on the map and adjust the radius of the area in which to look for
-            bikes. Finally, enable the auto booking feature to activate the
+            """To get started, select your city and then login to your
+            Nextbike account (use same credentials as in the Nextbike App).
+            Following, set a location by clicking on the map and adjust the
+            radius of the area in which to look for bikes.
+            Finally, enable the auto booking feature to activate the
             radar. Don't navigate away or refresh the site, as this will
             log you out. However, to select a new city, just refresh the site
             and login again."""
@@ -32,12 +33,10 @@ layout = html.Div(
         html.Br(),
         html.H2("What does auto booking do?"),
         html.P(
-            f"""When you enable auto booking, the nearest bike in your
-            search area will be automatically booked. If no bike is readily
+            f"""With auto booking enabled the nearest bike in your
+            search area will be automatically booked. If none is readily
             available, the radar will continue to look for bikes.
             As soon as a bike in your area becomes available it will be booked.
-            The distance to the bike, its identifier and the duration of your
-            booking will be displayed in the status.
             If a nearer bike become available while auto booking is active,
             it will be booked instead. Auto booking is automatically disabled
             after {MAX_BOOKING_DURATION_MIN} minutes to avoid misuse. You
@@ -58,10 +57,7 @@ layout = html.Div(
         html.Br(),
         html.H2("""How does it work?"""),
         html.P(
-            f"""{APP_NAME} is using the API of the Nextbike app to take
-            automatic actions for you. It regularly refreshes the location of
-            nearby bikes and looks for them within the set search area.
-            For technical details and the source code, check out the GitHub
+            """For technical details and the source code, check out the GitHub
             repo linked below.
             """
         ),

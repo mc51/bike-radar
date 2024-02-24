@@ -1,4 +1,5 @@
 """Configuration"""
+
 import os
 
 # General
@@ -8,7 +9,7 @@ APP_NAME = "Bike Radar"
 DB_NAME = "bikeradar.db"
 DB_TABLE = "bikes"
 CLAIM = "Book your nearby Nextbike ride the moment it appears!"
-DESCRIPTION = f"""{APP_NAME} is a free and open source web app for Nextbike users.
+DESCRIPTION = f"""{APP_NAME} is a free and open source app for Nextbike users.
 It secures nearby rides for you by booking them as soon as they
 become available in your selected area."""
 GITHUB_REPO_URL = "https://github.com/mc51/bike-radar"
@@ -18,9 +19,9 @@ BOOKING_TIME_FORMAT = r"%H:%M"
 # Map
 MIN_RADAR_RADIUS = 100
 MAX_RADAR_RADIUS = 1000
-DEFAULT_RADAR_RADIUS = 800
+DEFAULT_RADAR_RADIUS = 500
 RADAR_RADIUS_STEP = 250
-FRONTEND_REFRESH_INTERVAL = 1000 * 30  # in ms
+FRONTEND_REFRESH_INTERVAL = 1000 * 15  # in ms
 STATUS_MSG_DURATION = 1000 * 4  # in ms
 MAX_BOOKING_DURATION_MIN = 20
 
