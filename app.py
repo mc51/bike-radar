@@ -1,11 +1,12 @@
 """Main app"""
+
 import logging
 
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html
 
-from pages.src.config import DEBUG, APP_NAME, DESCRIPTION
+from pages.src.config import DEBUG, APP_NAME, META_TAGS
 from pages.src.callbacks import Callbacks
 from pages.src.utils import RedactingFormatter, get_version
 
@@ -26,12 +27,7 @@ app = Dash(
     use_pages=True,
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.YETI],
-    meta_tags=[
-        {
-            "description": DESCRIPTION,
-            "og:image": "/assets/logo.png",
-        }
-    ],
+    meta_tags=META_TAGS,
 )
 server = app.server
 app.layout = html.Div(

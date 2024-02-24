@@ -40,3 +40,22 @@ MAPS_URL = "https://maps.nextbike.net/maps/nextbike-live.flatjson"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) Gecko/20100101 Firefox/119.0",
 }
+
+
+# Meta tags
+METATAGS = {
+    "description": DESCRIPTION,
+    "og:image": "/assets/logo.png",
+    "smartbanner:title": "Bike Radar for Nextbike",
+    "smartbanner:author": "www.data-dive.com",
+    "smartbanner:price": "FREE",
+    "smartbanner:price-suffix-google": " - In Google Play",
+    "smartbanner:icon-google": "http://lh3.ggpht.com/f4oX61ljZ6x8aYDELZOgxlvdUEu73-wSQ4fy5bx6fCRISnZP8T353wdaM43RO_DbGg=w300",
+    "smartbanner:button": "VIEW",
+    "smartbanner:button-url-google": "https://play.google.com/store/apps/details?id=com.data_dive.com.bikeradar",
+    "smartbanner:enabled-platforms": "android",
+    "smartbanner:close-label": "Close",
+    "smartbanner:hide-ttl": "1000",
+}
+
+META_TAGS = [{"name": k, "content": v} for k, v in METATAGS.items()]
