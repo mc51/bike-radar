@@ -1,4 +1,5 @@
 """Locations stuff"""
+
 import json
 import logging
 import sqlite3
@@ -74,21 +75,6 @@ class Locations:  # pylint: disable=too-many-instance-attributes
         self.places = self.locations["places"]
         self.cities_with_bikes = self.filter_for_cities_with_bikes(self.cities)
         self.bikes = self.filter_for_places_with_bikes(self.places)
-
-    def get_timezone_for_city(self, city_id: int) -> str:
-        """Get timezone for city from countries information.
-
-        Args:
-            city_id (int): city id
-
-        Returns:
-            str: timezone
-        """
-        log.debug("Getting timezone for city id: %s.", city_id)
-        domain = [x["domain"] for x in self.cities if x["uid"] == city_id][0]
-        timezone = [x["timezone"] for x in self.countries if x["domain"] == domain][0]
-        log.debug("Domain: %s, Timezone: %s.", domain, timezone)
-        return timezone
 
     def get_timezone_for_city(self, city_id: int) -> str:
         """Get timezone for city from countries information.
