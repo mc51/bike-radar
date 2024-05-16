@@ -1,4 +1,5 @@
 """Utilities"""
+
 import re
 from logging import Formatter
 from pathlib import Path
@@ -38,7 +39,7 @@ def create_bike_markers(
         list[GeoJSON | Marker | None]: markers
     """
     booked_bike = None
-    if current_booking:
+    if current_booking and current_booking.is_active:
         booked_bike = Marker(
             position=[current_booking.lat, current_booking.lng],
             icon={

@@ -1,4 +1,5 @@
 """Booking stuff"""
+
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -99,6 +100,9 @@ class Booking:  # pylint: disable=too-many-instance-attributes
         Returns:
             bool: is active
         """
+        if not hasattr(self, "state_id"):
+            log.debug("state_id attr not found: No active booking.")
+            return False
         if self.state_id == 5:
             return True
         return False
