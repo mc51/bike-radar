@@ -117,7 +117,8 @@ class Layout:
                                 placeholder="Select city",
                                 id="city_select_dropdown",
                                 maxHeight=400,
-                                clearable=False,
+                                clearable=True,
+                                searchable=False,  # if searchable, selection bug on android
                             )
                         ),
                         dbc.Col(
