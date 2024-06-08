@@ -112,13 +112,11 @@ class Layout:
                 dbc.Row(
                     [
                         dbc.Col(
-                            dcc.Dropdown(
-                                cities,
-                                placeholder="Select city",
+                            dbc.Select(
                                 id="city_select_dropdown",
-                                maxHeight=400,
-                                clearable=True,
-                                searchable=False,  # if searchable, selection bug on android
+                                options=cities,
+                                persistence=True,
+                                persistence_type="local",
                             )
                         ),
                         dbc.Col(
