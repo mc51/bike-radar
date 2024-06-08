@@ -115,6 +115,7 @@ class Layout:
                             dbc.Select(
                                 id="city_select_dropdown",
                                 options=cities,
+                                placeholder="Select a region",
                                 persistence=True,
                                 persistence_type="local",
                             )
